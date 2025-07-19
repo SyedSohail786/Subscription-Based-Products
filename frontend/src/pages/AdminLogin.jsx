@@ -1,17 +1,20 @@
 import { useState } from "react";
 import useAuthStore from "../store/authStore";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuthStore();
-
+  const navigate = useNavigate();
   const handleLogin = async () => {
     try {
       await login({ email, password }, "admin");
-      window.location.href = "/admin/dashboard";
-    } catch {
-      alert("Admin login failed");
+      toast.success("Admin login successful");
+      navigate("/admin/dashboard");
+    } catch(err) {
+      toast.error(err.response.data.message);
     }
   };
 

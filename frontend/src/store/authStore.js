@@ -15,7 +15,6 @@ const useAuthStore = create((set) => ({
       const res = await axios.post(endpoint, credentials, { withCredentials: true });
       set({ user: res.data, role: type });
     } catch (err) {
-      console.error("Login failed", err.response?.data || err.message);
       throw err;
     }
   },
@@ -40,11 +39,11 @@ const useAuthStore = create((set) => ({
 
   setUserFromSession: async () => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/auth/me`);
+      const res = await axios.get(`${BACKEND_URL}/api/auth/user/me`,{withCredentials:true});
       if (res.data.role === "admin") {
-        set({ user: res.data.user, role: "admin" });
+        set({ user: res.data, role: "admin" });
       } else {
-        set({ user: res.data.user, role: "user" });
+        set({ user: res.data, role: "user" });
       }
     } catch {
       set({ user: null, role: null });

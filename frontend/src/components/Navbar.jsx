@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
-
+import { useEffect } from "react";
+               
 const Navbar = () => {
-  const { user, role, logout } = useAuthStore();
+     const { user, role, logout, setUserFromSession } = useAuthStore();
+
+  useEffect(()=>{
+     setUserFromSession()
+  },[])
 
   return (
     <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
