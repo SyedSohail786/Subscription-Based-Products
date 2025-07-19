@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import useAuthStore from "../store/authStore";
+import useAuthStore from "../../store/authStore";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AdminUsersPage = () => {
