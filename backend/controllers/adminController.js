@@ -46,3 +46,47 @@ exports.changePassword = async (req, res) => {
 
   res.status(200).json({ message: "Password changed successfully" });
 };
+
+
+// ✅ Get single user by ID
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// ✅ Update user details (e.g., name, email, role)
+exports.updateUserById = async (req, res) => {
+  try {
+    const { name, email, role } = req.body;
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (role) user.role = role; // You can control allowed roles here
+
+    await user.save();
+    res.json({ message: "User updated successfully", user });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// ✅ Delete user
+exports.deleteUserById = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
