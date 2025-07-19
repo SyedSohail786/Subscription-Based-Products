@@ -1,16 +1,18 @@
 import { useState } from "react";
 import useAuthStore from "../store/authStore";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const { register } = useAuthStore();
-
+     const navigate = useNavigate();
   const handleRegister = async () => {
     try {
       await register(form);
-      window.location.href = "/login";
-    } catch {
-      alert("Registration failed");
+      navigate("/login");
+    } catch(err) {
+      toast.error(err.response.data.message);
     }
   };
 

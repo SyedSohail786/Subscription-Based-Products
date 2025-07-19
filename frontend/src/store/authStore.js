@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
+import toast from "react-hot-toast";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -8,11 +10,10 @@ const useAuthStore = create((set) => ({
   login: async (credentials, type) => {
     try {
       const endpoint =
-        type === "admin" ? "/api/auth/admin/login" : "/api/auth/user/login";
+        type === "admin" ? `${BACKEND_URL}/api/auth/admin/login` : `${BACKEND_URL}/api/auth/user/login`;
 
       const res = await axios.post(endpoint, credentials, { withCredentials: true });
-
-      set({ user: res.data.user, role: type });
+      set({ user: res.data, role: type });
     } catch (err) {
       console.error("Login failed", err.response?.data || err.message);
       throw err;
@@ -21,7 +22,7 @@ const useAuthStore = create((set) => ({
 
   register: async (data) => {
     try {
-      const res = await axios.post("/api/auth/user/register", data);
+      const res = await axios.post(`${BACKEND_URL}/api/auth/user/register`, data);
       return res.data;
     } catch (err) {
       console.error("Registration failed", err.response?.data || err.message);
@@ -30,13 +31,16 @@ const useAuthStore = create((set) => ({
   },
 
   logout: async () => {
-    await axios.post("/api/auth/logout");
+     await axios.post(`${BACKEND_URL}/api/auth/user/logout`, {}, {
+          withCredentials: true
+        });
     set({ user: null, role: null });
+    toast.success("Logged out successfully");
   },
 
   setUserFromSession: async () => {
     try {
-      const res = await axios.get("/api/auth/me");
+      const res = await axios.get(`${BACKEND_URL}/api/auth/me`);
       if (res.data.role === "admin") {
         set({ user: res.data.user, role: "admin" });
       } else {

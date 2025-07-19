@@ -1,17 +1,20 @@
 import { useState } from "react";
 import useAuthStore from "../store/authStore";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuthStore();
-
+  const navigate = useNavigate();
   const handleLogin = async () => {
     try {
       await login({ email, password }, "user");
-      window.location.href = "/";
-    } catch {
-      alert("Login failed");
+      navigate("/");
+      toast.success("Login successful");
+    } catch(err) {
+      toast.error(err.response.data.message);
     }
   };
 
