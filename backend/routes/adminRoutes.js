@@ -3,7 +3,8 @@ const {
   getAdminStats,
   getAllUsers,
   getAllProducts,
-  getAllSubscriptions
+  getAllSubscriptions,
+  changePassword
 } = require("../controllers/adminController");
 
 const { protect, adminOnly } = require("../middleware/authMiddleware");
@@ -15,5 +16,6 @@ router.get("/stats", protect, adminOnly, getAdminStats);
 router.get("/users", protect, adminOnly, getAllUsers);
 router.get("/products", protect, adminOnly, getAllProducts);
 router.get("/subscriptions", protect, adminOnly, getAllSubscriptions);
+router.put("/change-password", protect, changePassword);
 
 module.exports = router;

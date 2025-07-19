@@ -3,7 +3,8 @@ const {
   getProfile,
   getDashboard,
   downloadProduct,
-  getSubscriptionStatus
+  getSubscriptionStatus,
+  changePassword
 } = require("../controllers/userController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -14,5 +15,6 @@ router.get("/me", protect, getProfile);
 router.get("/dashboard", protect, getDashboard);
 router.get("/download/:productId", protect, downloadProduct);
 router.get("/subscription", protect, getSubscriptionStatus);
+router.put("/change-password", protect, changePassword);
 
 module.exports = router;
