@@ -4,7 +4,10 @@ const {
   getAllUsers,
   getAllProducts,
   getAllSubscriptions,
-  changePassword
+  changePassword,
+  getUserById,
+  updateUserById,
+  deleteUserById
 } = require("../controllers/adminController");
 
 const { protect, adminOnly } = require("../middleware/authMiddleware");

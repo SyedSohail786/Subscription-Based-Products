@@ -6,7 +6,9 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const useAuthStore = create((set) => ({
   user: null,
   role: null, // 'user' or 'admin'
+  token: null,
 
+  setUser: (user, role, token) => set({ user, role, token }),
   login: async (credentials, type) => {
     try {
       const endpoint =
