@@ -10,21 +10,32 @@ exports.getProductById = async (req, res) => {
 
 // ✅ Create product (Admin)
 exports.createProduct = async (req, res) => {
-  const { title, description, category, price, tags, fileUrl, imageUrl } = req.body;
+  try {
+    const { title, description, category, price, tags } = req.body;
+    if(title || description || category || price || tags == null || undefined) return res.status(500).json({message:"All fields are required"})
 
-  const product = new Product({
-    title,
-    description,
-    category,
-    price,
-    tags,
-    fileUrl,
-    imageUrl
-  });
+    const fileUrl = req.files?.file?.[0]?.path;
+    const imageUrl = req.files?.image?.[0]?.path;
 
-  const saved = await product.save();
-  res.status(201).json(saved);
+    const product = new Product({
+      title,
+      description,
+      category,
+      price,
+      tags: typeof tags === 'string' ? tags.split(',') : tags,
+      fileUrl,
+      imageUrl,
+    });
+
+    const saved = await product.save();
+    res.status(201).json(saved);
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res.status(500).json({ message: "Error creating product" });
+  }
 };
+
+
 
 // ✅ Update product
 exports.updateProduct = async (req, res) => {

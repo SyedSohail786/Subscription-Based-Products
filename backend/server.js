@@ -14,6 +14,9 @@ app.use(cors({
      credentials: true
 }))
 app.use(cookieParser());
+app.use('/uploads', express.static('uploads'));
+
+
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
