@@ -32,7 +32,10 @@ exports.logoutUser = (req, res) => {
 
 // 👉 Get Current User
 exports.getMe = async (req, res) => {
-  const user = await User.findById(req.userId).select("-password");
+  let user = await User.findById(req.userId).select("-password");
+  if(user===null){
+    user = await Admin.findById(req.userId).select("-password");
+  }
   res.json(user);
 };
 

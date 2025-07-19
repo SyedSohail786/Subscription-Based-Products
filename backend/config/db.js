@@ -7,7 +7,7 @@ const createDefaultAdmin = async ()=>{
   if(alreadyAdmin) return console.log("Default Admin Exist✅");
   const admin = new Admin({
     email: "admin@email.com",
-    password: "password",
+    password: "admin@123",
     role: "admin",
     });
     admin.save();
