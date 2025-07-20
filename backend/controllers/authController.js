@@ -1,17 +1,50 @@
 const User = require("../models/User");
 const Admin = require("../models/Admin");
 const generateToken = require("../utils/generateToken");
+const Plan = require("../models/Plan");
 
 // 👉 Register User
 exports.registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-  const exists = await User.findOne({ email });
-  if (exists) return res.status(400).json({ message: "User already exists" });
+  try {
+    const { name, email, password } = req.body;
 
-  const user = await User.create({ name, email, password });
-  generateToken(res, user._id, 'user');
-  res.status(201).json({ _id: user._id, name: user.name, email: user.email });
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: "User already exists" });
+
+    const user = await User.create({ name, email, password });
+
+    // 🔐 Auto-assign Trial Plan
+    const trialPlan = await Plan.findOne({ name: "Trial" });
+    if (!trialPlan) return res.status(500).json({ message: "Trial plan not found" });
+
+    const now = new Date();
+    const endDate = new Date(now);
+    endDate.setDate(now.getDate() + trialPlan.durationInDays);
+
+    user.subscription = {
+      plan: trialPlan._id,
+      startDate: now,
+      endDate,
+      active: true
+    };
+
+    await user.save();
+
+    generateToken(res, user._id, 'user');
+
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      subscription: user.subscription
+    });
+
+  } catch (error) {
+    console.error("Registration failed:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
 };
+
 
 // 👉 Login User
 exports.loginUser = async (req, res) => {
