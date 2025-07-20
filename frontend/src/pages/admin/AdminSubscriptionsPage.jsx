@@ -39,6 +39,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
               <th className="p-2 border">Start Date</th>
               <th className="p-2 border">End Date</th>
               <th className="p-2 border">Active</th>
+              <th className="p-2 border">Transaction ID</th>
             </tr>
           </thead>
           <tbody>
@@ -53,6 +54,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
                     {sub.isActive ? "Active" : "Expired"}
                   </span>
                 </td>
+                <td className="p-2 border">{sub.paymentId}</td>
               </tr>
             ))}
           </tbody>

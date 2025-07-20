@@ -6,7 +6,6 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import Navbar from "./components/Navbar";
 import Home from "./pages/user/Home";
-import AdminProductsPage from "./pages/admin/ProductsPage";
 import AdminPlansPage from "./pages/admin/AdminPlansPage";
 import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage";
 import AdminCoupons from "./pages/admin/AdminCoupons";
@@ -15,6 +14,7 @@ import ProductDetail from "./pages/user/ProductDetail";
 import Payment from "./pages/user/Payment";
 import MyBag from "./pages/user/MyBag";
 import UserProfile from "./pages/user/UserProfile";
+import AdminProductsPage from "./pages/admin/AdminProductsPage";
 
 export default function App() {
   const { user, role } = useAuthStore();

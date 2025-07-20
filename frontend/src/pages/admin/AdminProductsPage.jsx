@@ -212,7 +212,7 @@ export default function AdminProductsPage() {
                   <div>
                     <h2 className="text-lg font-semibold">{product.title}</h2>
                     <p className="text-sm">{product.description}</p>
-                    <p className="text-xs text-gray-500">₹ {product.price} | Category: {product.category}</p>
+                    <p className="text-xs text-gray-500">₹ {product.price} | Category: {product.category.name}</p>
                     <p className="text-xs text-gray-400">Tags: {product.tags.join(', ')}</p>
                   </div>
                   <div className="flex gap-2">

@@ -5,7 +5,8 @@ const subscriptionSchema = new mongoose.Schema({
   plan: { type: mongoose.Schema.Types.ObjectId, ref: "Plan", required: true },
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date, required: true },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
+  paymentId: { type: String, required: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Subscription", subscriptionSchema);
