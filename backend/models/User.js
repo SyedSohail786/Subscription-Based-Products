@@ -20,10 +20,16 @@ const userSchema = new mongoose.Schema(
     },
 
     // Purchased or accessible products
-    ownedProducts: [
+    ownedProducts:[
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product'
+        _id: mongoose.Schema.Types.ObjectId,
+        name: String,
+        description: String,
+        imageUrl: String,
+        fileUrl: String,
+        price: Number,
+        category: String,
+        createdAt: Date,
       }
     ],
   },

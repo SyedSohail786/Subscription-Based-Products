@@ -37,7 +37,7 @@ const Navbar = () => {
         ) : user ? (
           <>
             <Link to="/">Home</Link>
-            <Link to="/my-products">My Bag</Link>
+            <Link to="/my-bag">My Bag</Link>
             <Link to="/profile">Profile</Link>
             <button onClick={logoutFunction}>Logout</button>
           </>

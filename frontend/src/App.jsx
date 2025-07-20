@@ -13,6 +13,7 @@ import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ProductDetail from "./pages/user/ProductDetail";
 import Payment from "./pages/user/Payment";
+import MyBag from "./pages/user/MyBag";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -32,7 +33,7 @@ export default function App() {
           <>
             <Route path="/cart" element={<h1>Cart</h1> } />
             <Route path="/profile" element={<h1>Profile</h1>}/>
-            <Route path="/my-products" element={ <h1>MyProducts </h1>  } />
+            <Route path="/my-bag" element={ <MyBag/> } />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/payment" element={<Payment />} />
 
