@@ -25,7 +25,8 @@ exports.registerUser = async (req, res) => {
       plan: trialPlan._id,
       startDate: now,
       endDate,
-      active: true
+      active: true,
+      paymentId: null,
     };
 
     await user.save();

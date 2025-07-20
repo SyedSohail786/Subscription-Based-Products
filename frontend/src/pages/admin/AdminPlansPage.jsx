@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAdminPlanStore } from '../../store/adminPlanStore';
+import toast from 'react-hot-toast';
 
 const AdminPlansPage = () => {
   const {
@@ -30,7 +31,7 @@ const AdminPlansPage = () => {
   const handleSubmit = async () => {
     const { name, price, durationInDays } = form;
     if (!name || !price || !durationInDays) {
-      return alert('Please fill all required fields');
+      return toast.error('Please fill all required fields');
     }
 
     if (editId) {

@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema(
       },
       startDate: Date,
       endDate: Date,
-      active: { type: Boolean, default: false }
+      active: { type: Boolean, default: false },
+      paymentId: String,
     },
 
     // Purchased or accessible products
@@ -29,7 +30,6 @@ const userSchema = new mongoose.Schema(
         fileUrl: String,
         price: Number,
         category: String,
-        paymentId: String,
         createdAt: Date,
       }
     ],

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
+import toast from "react-hot-toast";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -25,7 +26,7 @@ const Payment = () => {
 
      const handlePayment = async () => {
           const res = await loadRazorpayScript();
-          if (!res) return alert("Razorpay SDK failed to load");
+          if (!res) return toast.error("Razorpay SDK failed to load");
 
           const { data: order } = await axios.post(`${BACKEND_URL}/api/payments/create-order`, { amount }, { withCredentials: true });
 
@@ -47,10 +48,10 @@ const Payment = () => {
 
                     const verifyRes = await axios.post(`${BACKEND_URL}/api/payments/verify`, payload, { withCredentials: true });
                     if (verifyRes.data.success) {
-                         alert("Payment Successful!");
+                         toast.success("Payment Successful!");
                          navigate("/"); // or redirect to success page
                     } else {
-                         alert("Payment Verification Failed");
+                         toast.error("Payment Verification Failed");
                     }
                },
                prefill: {
