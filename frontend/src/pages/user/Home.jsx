@@ -13,8 +13,7 @@ const Home = () => {
   }, []);
 
   const fetchProducts = (category = "") => {
-    axios
-      .get(`${BACKEND_URL}/api/products`, { params: { category } })
+    axios.get(`${BACKEND_URL}/api/products`, { params: { category } })
       .then(res => setProducts(res.data));
   };
 

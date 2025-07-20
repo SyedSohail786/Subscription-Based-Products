@@ -9,11 +9,6 @@ const useAuthStore = create((set,get) => ({
   role: null, // 'user' or 'admin'
   token: null,
 
-  navigate:(url)=>{
-    const navigate = useNavigate()
-    navigate(url)
-  },
-
   setUser: (user, role, token) => set({ user, role, token }),
   login: async (credentials, type) => {
     try {
@@ -43,7 +38,7 @@ const useAuthStore = create((set,get) => ({
         });
     set({ user: null, role: null });
     toast.success("Logged out successfully");
-    get().navigate("/login")
+    return true;
   },
 
   setUserFromSession: async () => {

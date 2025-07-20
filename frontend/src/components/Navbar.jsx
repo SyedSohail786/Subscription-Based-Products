@@ -29,7 +29,7 @@ const Navbar = () => {
             <Link to="/admin/subscriptions">Subscriptions</Link>
             <Link to="/admin/coupons">Coupons</Link>
             <Link to="/admin/me">Me</Link>
-            <button onClick={logout}>Logout</button>
+            <button onClick={logoutFunction}>Logout</button>
           </>
         ) : user ? (
           <>
@@ -43,6 +43,7 @@ const Navbar = () => {
           <>
             <Link to="/">Home</Link>
             <Link to="/login">Login</Link>
+            <Link to="/admin/login">Admin Login</Link>
           </>
         )}
       </div>
