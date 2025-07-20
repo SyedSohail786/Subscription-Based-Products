@@ -1,5 +1,5 @@
+const Category = require("../models/Category");
 const Product = require("../models/Product");
-
 
 // ✅ Get single product
 exports.getProductById = async (req, res) => {
@@ -72,12 +72,15 @@ exports.deleteProduct = async (req, res) => {
   res.json({ message: "Product deleted successfully" });
 };
 
+
+
 exports.getAllProducts = async (req, res) => {
   try {
     const { search, category, min, max, type } = req.query;
 
     const query = {};
 
+    // 🔍 Search filter (title or description)
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -85,21 +88,30 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
 
+    // 📚 Category filter (convert name to ObjectId)
     if (category) {
-      query.category = category;
+      const categoryDoc = await Category.findOne({ name: category });
+      if (categoryDoc) {
+        query.category = categoryDoc._id;
+      } else {
+        // No matching category found — return empty array
+        return res.status(200).json([]);
+      }
     }
 
+    // 🏷️ Tags/type filter
     if (type) {
-      query.tags = { $in: [type] }; // assuming tags is an array
+      query.tags = { $in: [type] }; // Assuming `tags` is an array of strings
     }
 
+    // 💰 Price filter
     if (min || max) {
       query.price = {};
       if (min) query.price.$gte = parseFloat(min);
       if (max) query.price.$lte = parseFloat(max);
     }
 
-    const products = await Product.find(query);
+    const products = await Product.find(query).populate("category"); // Optional populate
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
