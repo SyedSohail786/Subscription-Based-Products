@@ -82,28 +82,15 @@ const Home = () => {
       {/* Main Product Grid */}
       <div className="flex-1 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {products.map((product) => (
-          <div key={product._id} className="border p-4 shadow-md rounded" onClick={e=> navigate(`/product/${product._id}`)}>
-            <div>
+          <div key={product._id} className="border p-4 shadow-md rounded">
+            <div onClick={e => navigate(`/product/${product._id}`)}>
               <img src={`${BACKEND_URL}/${product.imageUrl}`} alt="" />
             </div>
             <h3 className="font-semibold text-lg">{product.name}</h3>
             <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-            <p className="text-indigo-600 font-bold">{product.price} ₹</p>
-            <button
-              onClick={() => toggleCart(product._id)}
-              className={`px-4 py-2 rounded text-white ${addedToCart[product._id] ? "bg-red-500" : "bg-green-600"
-                }`}
-            >
-              {addedToCart[product._id] ? "Remove from Cart" : "Add to Cart"}
-            </button>
+            <p className="text-indigo-600 font-bold">₹{product.price}</p>
 
-            <button
-              onClick={() => handleBuyNow(product._id)}
-              className="px-4 py-2 rounded bg-indigo-600 text-white"
-            >
-              Buy Now
-            </button>
-
+            <button className="px-4 py-2 rounded bg-indigo-600 text-white" onClick={e => navigate(`/product/${product._id}`)}>View Details</button>
           </div>
         ))}
       </div>

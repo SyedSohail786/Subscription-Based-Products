@@ -22,7 +22,8 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.verifyPayment = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId } = req.body;
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId } = req.body;
 
   const body = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET)
@@ -49,4 +50,9 @@ exports.verifyPayment = async (req, res) => {
   } else {
     res.status(400).json({ success: false, message: "Payment verification failed." });
   }
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({ success: false, message: "Payment verification failed." });
+  }
+  
 };

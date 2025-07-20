@@ -14,9 +14,12 @@ const Navbar = () => {
     res && navigate('/login')
   }
 
+  const nav =()=>{
+    role === "admin" ? navigate("/admin/dashboard"): navigate("/")
+  }
   return (
     <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
-      <div className="text-xl font-bold">
+      <div className="text-xl font-bold" onClick={nav}>
         {role === "admin" ? "Digital Store Admin" : "Digital Product Store"}
       </div>
       <div className="flex gap-4 items-center">
@@ -34,9 +37,8 @@ const Navbar = () => {
         ) : user ? (
           <>
             <Link to="/">Home</Link>
-            <Link to="/cart">Cart</Link>
+            <Link to="/my-products">My Bag</Link>
             <Link to="/profile">Profile</Link>
-            <Link to="/my-products">My Products</Link>
             <button onClick={logoutFunction}>Logout</button>
           </>
         ) : (
