@@ -7,6 +7,10 @@ import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import Navbar from "./components/Navbar";
 import Home from "./pages/user/Home";
 import AdminProductsPage from "./pages/admin/ProductsPage";
+import AdminPlansPage from "./pages/admin/AdminPlansPage";
+import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage";
+import AdminCoupons from "./pages/admin/AdminCoupons";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -36,10 +40,10 @@ export default function App() {
             <Route path="/admin/dashboard" element={<h1>Dashboard</h1>} />
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/admin/products" element={<AdminProductsPage />} />
-            <Route path="/admin/plans" element={<h1>Plans</h1>} />
-            <Route path="/admin/subscriptions" element={<h1>Subscriptions</h1>} />
-            <Route path="/admin/coupons" element={<h1>Coupons</h1>} />
-            <Route path="/admin/me" element={<h1>Me</h1>} />
+            <Route path="/admin/plans" element={<AdminPlansPage/>} />
+            <Route path="/admin/subscriptions" element={<AdminSubscriptionsPage/>} />
+            <Route path="/admin/coupons" element={<AdminCoupons/>} />
+            <Route path="/admin/me" element={<AdminProfile/>} />
           </>
         )}
 

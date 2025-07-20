@@ -18,7 +18,7 @@ router.get("/:id", getProductById);
 
 // Admin-only
 router.post('/', protect, adminOnly,upload.fields([{ name: 'file', maxCount: 1 },{ name: 'image', maxCount: 1 },]),createProduct);
-router.put("/:id", protect, adminOnly, updateProduct);
+router.put("/:id", protect, adminOnly,upload.fields([{ name: 'file', maxCount: 1 },{ name: 'image', maxCount: 1 },]), updateProduct);
 router.delete("/:id", protect, adminOnly, deleteProduct);
 
 module.exports = router;

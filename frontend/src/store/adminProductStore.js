@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -20,16 +21,29 @@ export const useAdminProductStore = create((set) => ({
   },
 
   createProduct: async (data) => {
-    const res = await axios.post(`${BACKEND_URL}/api/products`, data, { withCredentials: true });
-    set((state) => ({ products: [...state.products, res.data] }));
+    try {
+      const res = await axios.post(`${BACKEND_URL}/api/products`, data, { withCredentials: true });
+      toast.success('Product created successfully');
+      set((state) => ({ products: [...state.products, res.data] }));
+    } catch (error) {
+      toast.error(error.message)
+    }
+
   },
 
   updateProduct: async (id, data) => {
-    const res = await axios.put(`${BACKEND_URL}/api/products/${id}`, data, { withCredentials: true });
-    set((state) => ({
-      products: state.products.map((p) => (p._id === id ? res.data : p)),
-    }));
-  },
+  const res = await axios.put(`${BACKEND_URL}/api/products/${id}`, data, {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'multipart/form-data', // optional; axios usually sets it automatically
+    },
+  });
+
+  set((state) => ({
+    products: state.products.map((p) => (p._id === id ? res.data : p)),
+  }));
+},
+
 
   deleteProduct: async (id) => {
     await axios.delete(`${BACKEND_URL}/api/products/${id}`, { withCredentials: true });

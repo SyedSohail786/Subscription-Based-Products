@@ -15,5 +15,4 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// ✅ THIS IS THE FIXED EXPORT
 module.exports = upload;

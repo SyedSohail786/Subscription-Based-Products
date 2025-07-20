@@ -1,13 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import { useEffect } from "react";
-               
-const Navbar = () => {
-     const { user, role, logout, setUserFromSession } = useAuthStore();
 
-  useEffect(()=>{
-     setUserFromSession()
-  },[])
+const Navbar = () => {
+  const { user, role, logout, setUserFromSession } = useAuthStore();
+  const navigate = useNavigate();
+  useEffect(() => {
+    setUserFromSession()
+  }, [])
+
+  const logoutFunction = async () => {
+    const res = await logout()
+    res && navigate('/login')
+  }
 
   return (
     <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
@@ -32,7 +37,7 @@ const Navbar = () => {
             <Link to="/cart">Cart</Link>
             <Link to="/profile">Profile</Link>
             <Link to="/my-products">My Products</Link>
-            <button onClick={logout}>Logout</button>
+            <button onClick={logoutFunction}>Logout</button>
           </>
         ) : (
           <>

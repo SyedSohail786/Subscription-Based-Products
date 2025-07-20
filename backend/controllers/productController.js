@@ -12,10 +12,14 @@ exports.getProductById = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const { title, description, category, price, tags } = req.body;
-    if(title || description || category || price || tags == null || undefined) return res.status(500).json({message:"All fields are required"})
-
     const fileUrl = req.files?.file?.[0]?.path;
     const imageUrl = req.files?.image?.[0]?.path;
+    console.log(title, description, category, price, tags)
+    if (!title || !description || !category || !price || !tags) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+
 
     const product = new Product({
       title,
@@ -39,7 +43,10 @@ exports.createProduct = async (req, res) => {
 
 // ✅ Update product
 exports.updateProduct = async (req, res) => {
-  const { title, description, category, price, tags, fileUrl, imageUrl } = req.body;
+  const { title, description, category, price, tags } = req.body;
+
+  const fileUrl = req.files?.file?.[0]?.path;
+  const imageUrl = req.files?.image?.[0]?.path;
 
   const product = await Product.findById(req.params.id);
   if (!product) return res.status(404).json({ message: "Product not found" });
@@ -60,41 +67,41 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) return res.status(404).json({ message: "Product not found" });
-
-  await product.remove();
+ 
+  await Product.findByIdAndDelete(req.params.id);
   res.json({ message: "Product deleted successfully" });
 };
 
 exports.getAllProducts = async (req, res) => {
-     try {
-       const { search, category, min, max, type } = req.query;
-   
-       const query = {};
-   
-       if (search) {
-         query.$or = [
-           { title: { $regex: search, $options: "i" } },
-           { description: { $regex: search, $options: "i" } },
-         ];
-       }
-   
-       if (category) {
-         query.category = category;
-       }
-   
-       if (type) {
-         query.tags = { $in: [type] }; // assuming tags is an array
-       }
-   
-       if (min || max) {
-         query.price = {};
-         if (min) query.price.$gte = parseFloat(min);
-         if (max) query.price.$lte = parseFloat(max);
-       }
-   
-       const products = await Product.find(query);
-       res.status(200).json(products);
-     } catch (err) {
-       res.status(500).json({ message: "Server Error", error: err.message });
-     }
+  try {
+    const { search, category, min, max, type } = req.query;
+
+    const query = {};
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (type) {
+      query.tags = { $in: [type] }; // assuming tags is an array
+    }
+
+    if (min || max) {
+      query.price = {};
+      if (min) query.price.$gte = parseFloat(min);
+      if (max) query.price.$lte = parseFloat(max);
+    }
+
+    const products = await Product.find(query);
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
 };

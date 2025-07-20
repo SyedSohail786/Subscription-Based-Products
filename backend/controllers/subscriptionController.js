@@ -59,3 +59,18 @@ exports.getAllPlans = async (req, res) => {
   const plans = await Plan.find();
   res.json(plans);
 };
+
+
+// 📊 Admin gets all subscriptions
+exports.getAllSubscriptions = async (req, res) => {
+  try {
+    const subscriptions = await Subscription.find()
+      .populate("user", "name email")
+      .populate("plan", "name price durationInDays");
+
+    res.json(subscriptions);
+  } catch (error) {
+    console.error("Error fetching subscriptions:", error);
+    res.status(500).json({ message: "Failed to fetch subscriptions" });
+  }
+};

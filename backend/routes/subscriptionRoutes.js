@@ -3,7 +3,8 @@ const {
   subscribeToPlan,
   getMySubscription,
   createPlan,
-  getAllPlans
+  getAllPlans,
+  getAllSubscriptions
 } = require("../controllers/subscriptionController");
 
 const { protect, adminOnly } = require("../middleware/authMiddleware");
@@ -17,5 +18,6 @@ router.get("/me", protect, getMySubscription);
 // 👑 Admin
 router.post("/plans", protect, adminOnly, createPlan);
 router.get("/plans", protect, adminOnly, getAllPlans);
+router.get("/", protect, adminOnly, getAllSubscriptions);
 
 module.exports = router;

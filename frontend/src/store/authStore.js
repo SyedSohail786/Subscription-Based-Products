@@ -1,12 +1,18 @@
 import { create } from "zustand";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set,get) => ({
   user: null,
   role: null, // 'user' or 'admin'
   token: null,
+
+  navigate:(url)=>{
+    const navigate = useNavigate()
+    navigate(url)
+  },
 
   setUser: (user, role, token) => set({ user, role, token }),
   login: async (credentials, type) => {
@@ -37,6 +43,7 @@ const useAuthStore = create((set) => ({
         });
     set({ user: null, role: null });
     toast.success("Logged out successfully");
+    get().navigate("/login")
   },
 
   setUserFromSession: async () => {
