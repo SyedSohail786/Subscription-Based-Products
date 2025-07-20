@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
       active: { type: Boolean, default: false }
     },
 
-    // Purchased or accessible products (via subscription or direct buy)
+    // Purchased or accessible products
     ownedProducts: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -27,16 +27,17 @@ const userSchema = new mongoose.Schema(
       }
     ],
 
-    // Optional: Track download history
-    downloads: [
+    // ✅ Cart items directly embedded inside user
+    cart: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product'
+          ref: 'Product',
+          required: true
         },
-        downloadedAt: {
-          type: Date,
-          default: Date.now
+        quantity: {
+          type: Number,
+          default: 1
         }
       }
     ]

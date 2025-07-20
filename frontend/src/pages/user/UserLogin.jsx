@@ -23,6 +23,7 @@ const UserLogin = () => {
       <h2 className="text-xl mb-4">User Login</h2>
       <input placeholder="Email" onChange={e => setEmail(e.target.value)} className="block mb-2 w-full p-2" />
       <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} className="block mb-4 w-full p-2" />
+      <p onClick={e=>navigate("/register")} className="cursor-pointer">Register here</p>
       <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2">Login</button>
     </div>
   );
