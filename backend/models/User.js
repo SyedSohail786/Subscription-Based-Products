@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
         fileUrl: String,
         price: Number,
         category: String,
+        paymentId: String,
         createdAt: Date,
       }
     ],

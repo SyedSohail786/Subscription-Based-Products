@@ -14,6 +14,7 @@ import AdminProfile from "./pages/admin/AdminProfile";
 import ProductDetail from "./pages/user/ProductDetail";
 import Payment from "./pages/user/Payment";
 import MyBag from "./pages/user/MyBag";
+import UserProfile from "./pages/user/UserProfile";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -31,8 +32,7 @@ export default function App() {
         {/* Protected User Routes */}
          {role === "user" && (
           <>
-            <Route path="/cart" element={<h1>Cart</h1> } />
-            <Route path="/profile" element={<h1>Profile</h1>}/>
+            <Route path="/profile" element={<UserProfile/>}/>
             <Route path="/my-bag" element={ <MyBag/> } />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/payment" element={<Payment />} />

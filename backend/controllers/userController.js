@@ -2,10 +2,13 @@ const User = require("../models/User");
 const Product = require("../models/Product");
 const Subscription = require("../models/Subscription");
 const bcrypt = require("bcryptjs");
+const Plan = require("../models/Plan");
 
 // 👉 Get Logged In User Info
 exports.getProfile = async (req, res) => {
   const user = await User.findById(req.userId).select("-password");
+  const plan = await Plan.findById(user.subscription.plan);
+  user.subscription.plan = plan;
   res.json(user);
 };
 
