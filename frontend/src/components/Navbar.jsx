@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import { useEffect, useState, useRef } from "react";
 import { Menu, X, ChevronDown, ChevronUp, ShoppingBag, User, Home } from "lucide-react";
+import { FaStore } from "react-icons/fa6";
 
 const Navbar = () => {
   const { user, role, logout, setUserFromSession } = useAuthStore();
@@ -56,6 +57,7 @@ const Navbar = () => {
             className="flex-shrink-0 flex items-center cursor-pointer group"
             onClick={nav}
           >
+            <FaStore className="h-6 w-6 mr-1 text-white" />
             <span className="text-white text-xl font-bold tracking-tight group-hover:scale-105 transition-transform">
               {role === "admin" ? "Digital Store Admin" : "Digital Product Store"}
             </span>
