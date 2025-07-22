@@ -47,6 +47,9 @@ const ProductDetail = () => {
         const fileUrl = `${BACKEND_URL}/${product.fileUrl.replace(/\\/g, "/")}`;
         toast.success("Downloading...");
         window.open(fileUrl, "_blank");
+      } else if (res.data.canDownload === false) {
+        toast.error(res.data.message);
+        navigate("/profile");
       } else {
         navigate("/login");
       }

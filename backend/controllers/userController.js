@@ -102,9 +102,9 @@ exports.checkDownloadAccess = async (req, res) => {
       const limit = 5;
 
       if (used >= limit) {
-        return res.status(403).json({
+        return res.status(201).json({
           canDownload: false,
-          message: "Free trial limit (5 downloads) reached. Please subscribe.",
+          message: "Free trial limit reached. Please subscribe.",
           downloadsLeft: 0
         });
       }

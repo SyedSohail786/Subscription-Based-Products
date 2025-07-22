@@ -67,7 +67,12 @@ const UserProfile = () => {
         {subscription && subscription.plan ? (
           <>
             <div><strong>Plan:</strong> {subscription.plan.name}</div>
+            {
+              subscription.plan.price !=0 ? 
+            <div><strong>Downloads: </strong> Unlimited </div>:
             <div><strong>Free Download Used:</strong> {freeDownloadsUsed} / 5</div>
+            
+            }
             <div><strong>Status:</strong> {subscription.active ? "Active" : "Inactive"}</div>
             <div><strong>Expires On:</strong> {moment(subscription.endDate).format("MMMM D, YYYY")}</div>
           </>
