@@ -7,3 +7,26 @@ body {
      font-weight: 400;
      font-style: normal;
    }
+
+   .react-select-container {
+     width: 100%;
+   }
+   .react-select__control {
+     min-height: 44px;
+     border-radius: 0.5rem;
+     border-color: #d1d5db;
+   }
+   .react-select__control:hover {
+     border-color: #d1d5db;
+   }
+   .react-select__control--is-focused {
+     border-color: #6366f1;
+     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+   }
+   .react-select__multi-value {
+     background-color: #e0e7ff;
+     border-radius: 0.25rem;
+   }
+   .react-select__multi-value__label {
+     color: #4f46e5;
+   }
