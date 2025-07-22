@@ -30,7 +30,7 @@ export const useAdminProductStore = create((set) => ({
     try {
       set({ loading: true, error: null });
       const res = await axios.get(`${BACKEND_URL}/api/categories`);
-      set({ categories: res.data?.categories || [], loading: false });
+      set({ categories: res.data || [], loading: false });
     } catch (error) {
       console.error('Failed to fetch categories:', error);
       set({ 

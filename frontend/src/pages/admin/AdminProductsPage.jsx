@@ -45,7 +45,7 @@ export default function AdminProductsPage() {
     value: cat._id,
     label: cat.name
   }));
-
+console.log(categoryOptions)
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
