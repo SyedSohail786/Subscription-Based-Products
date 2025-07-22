@@ -49,7 +49,7 @@ const UserProfile = () => {
 
   if (loading || !user) return <p className="p-6">Loading...</p>;
 
-  const { name, email, createdAt, subscription } = user;
+  const { name, email, createdAt, subscription, freeDownloadsUsed } = user;
   const currentPlanId = subscription?.plan?._id;
 
   return (
@@ -67,6 +67,7 @@ const UserProfile = () => {
         {subscription && subscription.plan ? (
           <>
             <div><strong>Plan:</strong> {subscription.plan.name}</div>
+            <div><strong>Free Download Used:</strong> {freeDownloadsUsed} / 5</div>
             <div><strong>Status:</strong> {subscription.active ? "Active" : "Inactive"}</div>
             <div><strong>Expires On:</strong> {moment(subscription.endDate).format("MMMM D, YYYY")}</div>
           </>

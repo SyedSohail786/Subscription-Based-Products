@@ -68,19 +68,67 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.checkDownloadAccess = async (req, res) => {
-  const userId = req.userId;
-  const { productId } = req.params;
+  try {
+    const userId = req.userId;
+    const { productId } = req.params;
 
-  const user = await User.findById(userId);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ canDownload: false, message: "User not found" });
+    }
 
-  const hasAccess = user.ownedProducts.includes(productId) || (user.subscription?.active ?? false);
+    // Load subscription plan details
+    const planId = user.subscription.plan;
+    const plan = await Plan.findById(planId);
 
-  if (hasAccess) {
-    return res.status(200).json({ canDownload: true });
-  } else {
-    return res.status(403).json({ canDownload: false });
+    if (!plan) {
+      return res.status(404).json({ canDownload: false, message: "Plan not found" });
+    }
+
+    const isFree = plan.name === "Trial" || plan.name === "Free";
+    const isSubscribed = !isFree && user.subscription.active;
+
+    // Case 1: User owns the product or has an active paid subscription
+    const hasAccess =
+      user.ownedProducts.some(p => p._id.toString() === productId) || isSubscribed;
+
+    if (hasAccess) {
+      return res.status(200).json({ canDownload: true });
+    }
+
+    // Case 2: Free trial users with limited downloads
+    if (isFree) {
+      const used = user.freeDownloadsUsed || 0;
+      const limit = 5;
+
+      if (used >= limit) {
+        return res.status(403).json({
+          canDownload: false,
+          message: "Free trial limit (5 downloads) reached. Please subscribe.",
+          downloadsLeft: 0
+        });
+      }
+
+      user.freeDownloadsUsed = used + 1;
+      await user.save();
+
+      return res.status(200).json({
+        canDownload: true,
+        message: `Free trial download allowed (${user.freeDownloadsUsed}/${limit} used).`,
+        downloadsLeft: limit - user.freeDownloadsUsed
+      });
+    }
+
+    // Fallback
+    return res.status(403).json({ canDownload: false, message: "Access denied." });
+
+  } catch (error) {
+    console.error("Download access error:", error.message);
+    res.status(500).json({ canDownload: false, message: "Server error" });
   }
 };
+
+
 
 exports.addToLibrary = async (req, res) => {
   const userId = req.userId;
@@ -101,13 +149,6 @@ exports.getOwnedProducts = async (req, res) => {
   const user = await User.findById(req.userId).populate("ownedProducts", "_id");
   res.json({ ownedProducts: user.ownedProducts });
 };
-
-// exports.addToLibrary = async (req, res) => {
-//   await User.findByIdAndUpdate(req.userId, {
-//     $addToSet: { ownedProducts: req.params.productId }
-//   });
-//   res.status(200).json({ message: "Product added to your library." });
-// };
 
 exports.removeFromLibrary = async (req, res) => {
   const user = await User.findById(req.userId);
