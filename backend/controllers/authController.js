@@ -2,8 +2,10 @@ const User = require("../models/User");
 const Admin = require("../models/Admin");
 const generateToken = require("../utils/generateToken");
 const Plan = require("../models/Plan");
+const sendEmail = require("../utils/sendEmail");
 
-// 👉 Register User
+
+//user register
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -31,6 +33,49 @@ exports.registerUser = async (req, res) => {
 
     await user.save();
 
+    // 📧 Send welcome email
+    const emailHtml = `
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+    <div style="background-color: #4f46e5; padding: 16px; border-radius: 6px 6px 0 0; color: white; text-align: center;">
+      <h2 style="margin: 0;">Welcome to Digital Store 🎉</h2>
+    </div>
+
+    <div style="padding: 20px; background: white; border: 1px solid #ddd;">
+      <p style="font-size: 16px;">Hi <strong>${name}</strong>,</p>
+      
+      <p style="font-size: 15px;">
+        We're excited to have you on board! Your account has been successfully created and your free <strong>Trial Plan</strong> is now active. Here's what you get:
+      </p>
+
+      <ul style="font-size: 15px; line-height: 1.6; padding-left: 20px;">
+        <li>✅ Access to all trial products</li>
+        <li>📥 Download up to 5 digital items</li>
+        <li>📅 Plan valid for <strong>${trialPlan.durationInDays} days</strong> (until <strong>${endDate.toDateString()}</strong>)</li>
+      </ul>
+
+      <p style="font-size: 15px;">
+        You can now browse digital assets, download up to 5 items during your trial, and upgrade anytime to unlock full access.
+      </p>
+
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${process.env.FRONTEND_URL}" target="_blank" style="padding: 10px 20px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Explore Store</a>
+      </div>
+
+      <p style="font-size: 14px; color: #555;">
+        If you have any questions, feel free to reply to this email or reach out to our support team.
+      </p>
+
+      <p style="font-size: 14px; margin-top: 20px;">Best regards,<br><strong>Team Digital Store</strong></p>
+    </div>
+
+    <div style="text-align: center; font-size: 12px; color: #888; margin-top: 12px;">
+      © ${new Date().getFullYear()} Digital Store. All rights reserved.
+    </div>
+  </div>
+`;
+
+    await sendEmail(email, "Welcome to Digital Store 🎉", emailHtml);
+
     generateToken(res, user._id, 'user');
 
     res.status(201).json({
@@ -46,8 +91,7 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-
-// 👉 Login User
+//user login
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -67,7 +111,7 @@ exports.logoutUser = (req, res) => {
 // 👉 Get Current User
 exports.getMe = async (req, res) => {
   let user = await User.findById(req.userId).select("-password");
-  if(user===null){
+  if (user === null) {
     user = await Admin.findById(req.userId).select("-password");
   }
   res.json(user);

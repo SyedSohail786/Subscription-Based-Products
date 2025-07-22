@@ -72,15 +72,13 @@ exports.deleteProduct = async (req, res) => {
   res.json({ message: "Product deleted successfully" });
 };
 
-
-
 exports.getAllProducts = async (req, res) => {
   try {
-    const { search, category, min, max, type } = req.query;
+    const { search, category, min, max, type, sortBy, page = 1, limit = 10 } = req.query;
 
     const query = {};
 
-    // 🔍 Search filter (title or description)
+    // Search filter
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -88,32 +86,45 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
 
-    // 📚 Category filter (convert name to ObjectId)
+    // Category filter
     if (category) {
       const categoryDoc = await Category.findOne({ name: category });
       if (categoryDoc) {
         query.category = categoryDoc._id;
       } else {
-        // No matching category found — return empty array
-        return res.status(200).json([]);
+        return res.status(200).json({ products: [], totalPages: 0 });
       }
     }
 
-    // 🏷️ Tags/type filter
+    // Tags filter
     if (type) {
-      query.tags = { $in: [type] }; // Assuming `tags` is an array of strings
+      query.tags = { $in: [type] };
     }
 
-    // 💰 Price filter
+    // Price filter
     if (min || max) {
       query.price = {};
       if (min) query.price.$gte = parseFloat(min);
       if (max) query.price.$lte = parseFloat(max);
     }
 
-    const products = await Product.find(query).populate("category"); // Optional populate
-    res.status(200).json(products);
+    const sortOption = sortBy === "name" ? { title: 1 } : { createdAt: -1 };
+
+    const total = await Product.countDocuments(query);
+
+    const products = await Product.find(query)
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .populate("category");
+
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(200).json({ products, totalPages });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+
