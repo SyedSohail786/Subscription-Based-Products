@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 const Subscription = require("../models/Subscription");
 const bcrypt = require("bcryptjs");
 const Plan = require("../models/Plan");
+const Download = require("../models/Download");
 
 // 👉 Get Logged In User Info
 exports.getProfile = async (req, res) => {
@@ -93,6 +94,11 @@ exports.checkDownloadAccess = async (req, res) => {
       user.ownedProducts.some(p => p._id.toString() === productId) || isSubscribed;
 
     if (hasAccess) {
+      const download = await Download.create({
+        userId: user._id,
+        product: productId,
+        downloadDate: new Date()
+      });
       return res.status(200).json({ canDownload: true });
     }
 
@@ -111,6 +117,11 @@ exports.checkDownloadAccess = async (req, res) => {
 
       user.freeDownloadsUsed = used + 1;
       await user.save();
+      const download = await Download.create({
+        userId: user._id,
+        product: productId,
+        downloadDate: new Date()
+      });
 
       return res.status(200).json({
         canDownload: true,

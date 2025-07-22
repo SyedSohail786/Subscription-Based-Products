@@ -28,26 +28,6 @@ const Home = () => {
     fetchProducts(cat);
   };
 
-  const toggleCart = async (productId) => {
-    try {
-      if (addedToCart[productId]) {
-        await axios.delete(`${BACKEND_URL}/api/cart/remove/${productId}`, { withCredentials: true });
-        setAddedToCart((prev) => ({ ...prev, [productId]: false }));
-      } else {
-        await axios.post(`${BACKEND_URL}/api/cart/add`, { productId }, { withCredentials: true });
-        setAddedToCart((prev) => ({ ...prev, [productId]: true }));
-      }
-    } catch (err) {
-      console.error(err);
-      // optionally show toast error
-    }
-  };
-
-  const handleBuyNow = (productId) => {
-    window.location.href = `/product/${productId}`;
-  };
-
-
   return (
     <div className="flex">
       {/* Sidebar */}
@@ -88,7 +68,6 @@ const Home = () => {
             </div>
             <h3 className="font-semibold text-lg">{product.name}</h3>
             <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-            <p className="text-indigo-600 font-bold">₹{product.price}</p>
 
             <button className="px-4 py-2 rounded bg-indigo-600 text-white" onClick={e => navigate(`/product/${product._id}`)}>View Details</button>
           </div>

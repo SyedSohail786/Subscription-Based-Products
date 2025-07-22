@@ -91,7 +91,6 @@ const ProductDetail = () => {
         <div>
           <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
           <p className="text-gray-600 mb-4">{product.description}</p>
-          <p className="text-indigo-600 font-bold text-xl mb-4">₹{product.price}</p>
 
           <div className="flex gap-4">
             <button
