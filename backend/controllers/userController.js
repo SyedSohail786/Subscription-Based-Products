@@ -68,6 +68,7 @@ exports.changePassword = async (req, res) => {
   res.status(200).json({ message: "Password changed successfully" });
 };
 
+
 exports.checkDownloadAccess = async (req, res) => {
   try {
     const userId = req.userId;
@@ -139,22 +140,38 @@ exports.checkDownloadAccess = async (req, res) => {
   }
 };
 
-
-
 exports.addToLibrary = async (req, res) => {
   const userId = req.userId;
   const { productId } = req.params;
-  const product = await Product.findById(productId);
-  if (!product) return res.status(404).json({ message: "Product not found" });
 
   try {
-    await User.findByIdAndUpdate(userId, {ownedProducts: product}, {new: true});
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if the user already owns the product
+    const user = await User.findById(userId);
+    const alreadyOwned = user.ownedProducts.some(
+      (p) => p._id.toString() === productId
+    );
+    if (alreadyOwned) {
+      return res.status(400).json({ message: "Product already in library." });
+    }
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { ownedProducts: product } },
+      { new: true }
+    );
+
     res.status(200).json({ message: "Product added to your library." });
   } catch (err) {
     console.error("Add to library error:", err);
     res.status(500).json({ error: "Failed to add product to library." });
   }
 };
+
 
 exports.getOwnedProducts = async (req, res) => {
   const user = await User.findById(req.userId).populate("ownedProducts", "_id");
