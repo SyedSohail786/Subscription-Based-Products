@@ -175,6 +175,7 @@ exports.addToLibrary = async (req, res) => {
 
 exports.getOwnedProducts = async (req, res) => {
   const user = await User.findById(req.userId).populate("ownedProducts", "_id");
+  console.log(user)
   res.json({ ownedProducts: user.ownedProducts });
 };
 

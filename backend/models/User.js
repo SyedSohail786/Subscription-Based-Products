@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     ownedProducts: [
       {
         _id: mongoose.Schema.Types.ObjectId,
-        name: String,
+        title: String,
         description: String,
         imageUrl: String,
         fileUrl: String,

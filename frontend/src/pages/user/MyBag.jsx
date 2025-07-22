@@ -43,7 +43,7 @@ const MyBag = () => {
               className="w-full h-48 object-cover rounded-t-lg"
             />
             <div className="p-4">
-              <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
+              <h3 className="text-lg font-semibold mb-1">{product.title}</h3>
               <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
             </div>
           </div>
