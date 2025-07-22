@@ -96,9 +96,9 @@ exports.checkDownloadAccess = async (req, res) => {
 
     if (hasAccess) {
       const download = await Download.create({
-        userId: user._id,
+        user: user._id,
         product: productId,
-        downloadDate: new Date()
+        downloadedAt: new Date()
       });
       return res.status(200).json({ canDownload: true });
     }
@@ -119,9 +119,9 @@ exports.checkDownloadAccess = async (req, res) => {
       user.freeDownloadsUsed = used + 1;
       await user.save();
       const download = await Download.create({
-        userId: user._id,
+        user: user._id,
         product: productId,
-        downloadDate: new Date()
+        downloadedAt: new Date()
       });
 
       return res.status(200).json({
@@ -175,7 +175,6 @@ exports.addToLibrary = async (req, res) => {
 
 exports.getOwnedProducts = async (req, res) => {
   const user = await User.findById(req.userId).populate("ownedProducts", "_id");
-  console.log(user)
   res.json({ ownedProducts: user.ownedProducts });
 };
 

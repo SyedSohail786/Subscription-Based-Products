@@ -2,9 +2,9 @@
 const express = require("express");
 const router = express.Router();
 const Download = require("../models/Download");
-const { isAuthenticated } = require("../middleware/auth");
+const { protect } = require("../middleware/authMiddleware");
 
-router.post("/log", isAuthenticated, async (req, res) => {
+router.post("/log", protect, async (req, res) => {
   try {
     const { productId } = req.body;
     await Download.create({
@@ -18,7 +18,7 @@ router.post("/log", isAuthenticated, async (req, res) => {
 });
 
 // Get download history
-router.get("/history", isAuthenticated, async (req, res) => {
+router.get("/history", protect, async (req, res) => {
   try {
     const downloads = await Download.find({ user: req.user._id }).populate("product");
     res.json(downloads);
