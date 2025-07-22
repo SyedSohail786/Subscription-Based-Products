@@ -110,8 +110,8 @@ exports.getOwnedProducts = async (req, res) => {
 // };
 
 exports.removeFromLibrary = async (req, res) => {
-  await User.findByIdAndUpdate(req.userId, {
-    $pull: { ownedProducts: req.params.productId }
-  });
+  const user = await User.findById(req.userId);
+  user.ownedProducts = user.ownedProducts.filter(product => product._id.toString() !== req.params.productId);
+  await user.save();
   res.status(200).json({ message: "Product removed from your library." });
 };

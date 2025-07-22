@@ -20,8 +20,14 @@ const userSchema = new mongoose.Schema(
       paymentId: String,
     },
 
-    // Purchased or accessible products
-    ownedProducts:[
+    // Free trial tracking
+    freeDownloadsUsed: {
+      type: Number,
+      default: 0,
+    },
+
+    // Owned or downloaded products
+    ownedProducts: [
       {
         _id: mongoose.Schema.Types.ObjectId,
         name: String,
@@ -31,7 +37,7 @@ const userSchema = new mongoose.Schema(
         price: Number,
         category: String,
         createdAt: Date,
-      }
+      },
     ],
   },
   { timestamps: true }
