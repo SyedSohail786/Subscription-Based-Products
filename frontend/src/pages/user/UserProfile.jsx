@@ -9,10 +9,13 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [plans, setPlans] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [coupon, setCoupon] = useState("");
+  const [couponStatus, setCouponStatus] = useState(null);
+  const [checkingCoupon, setCheckingCoupon] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch current user
   const fetchUser = async () => {
     try {
       const res = await axios.get(`${BACKEND_URL}/api/user/me`, {
@@ -25,7 +28,6 @@ const UserProfile = () => {
     }
   };
 
-  // Fetch subscription plans
   const fetchPlans = async () => {
     try {
       const res = await axios.get(`${BACKEND_URL}/api/plans`, {
@@ -37,10 +39,39 @@ const UserProfile = () => {
     }
   };
 
-  // Handle plan selection → redirect to /payment
-  const handlePlanSelect = (plan) => {
-    const amount = plan.price
-    navigate(`/payment?amount=${amount}&productId=${plan._id}`);
+  const handleApplyCoupon = async () => {
+    try {
+      setCheckingCoupon(true);
+      const res = await axios.post(
+        `${BACKEND_URL}/api/coupons/apply`,
+        { code: coupon },
+        { withCredentials: true }
+      );
+
+      const { discountType, discountValue } = res.data;
+      let discountAmount = 0;
+
+      if (discountType === "flat") {
+        discountAmount = discountValue;
+      } else if (discountType === "percentage") {
+        discountAmount = Math.floor((selectedPlan.price * discountValue) / 100);
+      }
+
+      setCouponStatus({ valid: true, discountAmount });
+    } catch (err) {
+      const message = err.response?.data?.message || "Invalid coupon";
+      setCouponStatus({ valid: false, message });
+    } finally {
+      setCheckingCoupon(false);
+    }
+  };
+
+  const handleCheckout = () => {
+    let finalAmount = selectedPlan.price;
+    if (couponStatus?.valid) {
+      finalAmount -= couponStatus.discountAmount;
+    }
+    navigate(`/payment?amount=${finalAmount}&productId=${selectedPlan._id}`);
   };
 
   useEffect(() => {
@@ -51,7 +82,6 @@ const UserProfile = () => {
 
   const { name, email, createdAt, subscription, freeDownloadsUsed } = user;
   const currentPlanId = subscription?.plan?._id;
-  const currentPlanName = subscription?.plan?.name;
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -69,10 +99,9 @@ const UserProfile = () => {
           <>
             <div><strong>Plan:</strong> {subscription.plan.name}</div>
             {
-              subscription.plan.price != 0 ?
-                <div><strong>Downloads: </strong> Unlimited </div> :
-                <div><strong>Free Download Used:</strong> {freeDownloadsUsed} / 5</div>
-
+              subscription.plan.price !== 0
+                ? <div><strong>Downloads:</strong> Unlimited</div>
+                : <div><strong>Free Downloads Used:</strong> {freeDownloadsUsed} / 5</div>
             }
             <div><strong>Status:</strong> {subscription.active ? "Active" : "Inactive"}</div>
             <div><strong>Expires On:</strong> {moment(subscription.endDate).format("MMMM D, YYYY")}</div>
@@ -112,32 +141,68 @@ const UserProfile = () => {
 
                     {currentPlanId === plan._id ? (
                       <span className="text-sm text-green-600 font-semibold">Already Selected</span>
+                    ) : plan.name === "Trial" ? (
+                      <span className="text-sm text-red-600 font-semibold">Invalid Plan</span>
                     ) : (
-
-                      <>
-                        {
-                          plan.name === "Trial" && currentPlanId !== plan._id
-                            ?
-                            <span className="text-sm text-red-600 font-semibold">Invalid Plan</span>
-
-                            :
-                            <button
-                              onClick={() => handlePlanSelect(plan)}
-                              className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
-                            >
-                              Select
-                            </button>
-                        }
-                      </>
-
+                      <button
+                        onClick={() => {
+                          setSelectedPlan(plan);
+                          setCoupon("");
+                          setCouponStatus(null);
+                        }}
+                        className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+                      >
+                        Select
+                      </button>
                     )}
                   </div>
+
+                  {/* Show coupon input if plan is selected */}
+                  {selectedPlan?._id === plan._id && (
+                    <div className="mt-4 space-y-2">
+                      <input
+                        type="text"
+                        placeholder="Have a coupon? (optional)"
+                        className="w-full border px-3 py-2 rounded text-sm"
+                        value={coupon}
+                        onChange={(e) => setCoupon(e.target.value)}
+                      />
+
+                      <button
+                        onClick={handleApplyCoupon}
+                        disabled={checkingCoupon}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        {checkingCoupon ? "Checking..." : "Apply Coupon"}
+                      </button>
+
+                      {couponStatus?.valid && (
+                        <p className="text-green-600 text-sm">
+                          Coupon applied! Discount: ₹{couponStatus.discountAmount}
+                        </p>
+                      )}
+
+                      {couponStatus?.valid === false && (
+                        <p className="text-red-600 text-sm">{couponStatus.message}</p>
+                      )}
+
+                      <button
+                        onClick={handleCheckout}
+                        className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                      >
+                        Pay Without Coupon
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
 
             <button
-              onClick={() => setShowModal(false)}
+              onClick={() => {
+                setShowModal(false);
+                setSelectedPlan(null);
+              }}
               className="text-sm text-gray-500 mt-4"
             >
               Close

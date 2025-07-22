@@ -30,7 +30,7 @@ const AdminDashboard = () => {
       <ul>
         {data.topProducts.map((item, index) => (
           <li key={index}>
-            {item.product.name} — {item.count} downloads
+            {item.product.title} — {item.count} downloads
           </li>
         ))}
       </ul>
