@@ -3,6 +3,10 @@ const Product = require("../models/Product");
 const Subscription = require("../models/Subscription");
 const Admin = require("../models/Admin");
   const bcrypt = require("bcryptjs");
+const Payment = require("../models/Payment");
+const Plan = require("../models/Plan");
+const Category = require("../models/Category");
+const Download = require("../models/Download");
 
 // ✅ Admin Stats
 exports.getAdminStats = async (req, res) => {
@@ -100,3 +104,44 @@ exports.getMe = async (req, res) => {
   if(!user) return res.status(404).json({ message: "Admin not found" });
   res.json(user);
 };
+
+exports.getAdminStates = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalRevenue = await Payment.aggregate([
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+    const totalSubscriptions = await Subscription.countDocuments();
+    const totalProducts = await Product.countDocuments();
+    const totalPlans = await Plan.countDocuments();
+    const totalCategories = await Category.countDocuments();
+
+    const topProducts = await Download.aggregate([
+      { $group: { _id: "$product", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: "$product" },
+    ]);
+
+    res.json({
+      totalUsers,
+      totalRevenue: totalRevenue[0]?.total || 0,
+      totalSubscriptions,
+      totalProducts,
+      totalPlans,
+      totalCategories,
+      topProducts,
+    });
+  } catch (error) {
+    console.error("Analytics error:", error.message);
+    res.status(500).json({ message: "Failed to fetch analytics" });
+  }
+}

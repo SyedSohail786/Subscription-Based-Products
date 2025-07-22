@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const User = require("../models/User");
 const Plan = require("../models/Plan");
 const Subscription = require("../models/Subscription");
+const Payment = require("../models/Payment");
 
 exports.createOrder = async (req, res) => {
   try {
@@ -70,6 +71,17 @@ exports.verifyPayment = async (req, res) => {
       paymentId: razorpay_payment_id
     });
     await subscription.save();  
+
+    const payment = new Payment({
+      user: userId,
+      plan: plan._id,
+      amount: plan.price,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    });
+    await payment.save();
+
 
     return res.status(200).json({ success: true, message: "Payment verified & subscription activated." });
   } catch (error) {

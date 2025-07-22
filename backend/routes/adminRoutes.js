@@ -8,7 +8,8 @@ const {
   getUserById,
   updateUserById,
   deleteUserById,
-  getMe
+  getMe,
+  getAdminStates
 } = require("../controllers/adminController");
 
 const { protect, adminOnly } = require("../middleware/authMiddleware");
@@ -26,5 +27,6 @@ router.get("/users/:id", protect, adminOnly, getUserById);
 router.put("/users/:id", protect, adminOnly, updateUserById);
 router.delete("/users/:id", protect, adminOnly, deleteUserById);
 router.get("/me", protect, adminOnly, getMe);
+router.get("/dashboard/analytics",protect, adminOnly, getAdminStates);
 
 module.exports = router;

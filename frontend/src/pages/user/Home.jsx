@@ -66,7 +66,7 @@ const Home = () => {
             <div onClick={e => navigate(`/product/${product._id}`)}>
               <img src={`${BACKEND_URL}/${product.imageUrl}`} alt="" />
             </div>
-            <h3 className="font-semibold text-lg">{product.name}</h3>
+            <h3 className="font-semibold text-lg">{product.title}</h3>
             <p className="text-sm text-gray-600 mb-2">{product.description}</p>
 
             <button className="px-4 py-2 rounded bg-indigo-600 text-white" onClick={e => navigate(`/product/${product._id}`)}>View Details</button>

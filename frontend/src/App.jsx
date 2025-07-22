@@ -15,6 +15,7 @@ import Payment from "./pages/user/Payment";
 import MyBag from "./pages/user/MyBag";
 import UserProfile from "./pages/user/UserProfile";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -43,7 +44,7 @@ export default function App() {
         {/* Protected Admin Routes */}
          {role === "admin" && (
           <>
-            <Route path="/admin/dashboard" element={<h1>Dashboard</h1>} />
+            <Route path="/admin/dashboard" element={<AdminDashboard/>} />
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/admin/products" element={<AdminProductsPage />} />
             <Route path="/admin/plans" element={<AdminPlansPage/>} />
