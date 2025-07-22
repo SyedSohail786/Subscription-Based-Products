@@ -51,6 +51,7 @@ const UserProfile = () => {
 
   const { name, email, createdAt, subscription, freeDownloadsUsed } = user;
   const currentPlanId = subscription?.plan?._id;
+  const currentPlanName = subscription?.plan?.name;
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -68,10 +69,10 @@ const UserProfile = () => {
           <>
             <div><strong>Plan:</strong> {subscription.plan.name}</div>
             {
-              subscription.plan.price !=0 ? 
-            <div><strong>Downloads: </strong> Unlimited </div>:
-            <div><strong>Free Download Used:</strong> {freeDownloadsUsed} / 5</div>
-            
+              subscription.plan.price != 0 ?
+                <div><strong>Downloads: </strong> Unlimited </div> :
+                <div><strong>Free Download Used:</strong> {freeDownloadsUsed} / 5</div>
+
             }
             <div><strong>Status:</strong> {subscription.active ? "Active" : "Inactive"}</div>
             <div><strong>Expires On:</strong> {moment(subscription.endDate).format("MMMM D, YYYY")}</div>
@@ -112,12 +113,23 @@ const UserProfile = () => {
                     {currentPlanId === plan._id ? (
                       <span className="text-sm text-green-600 font-semibold">Already Selected</span>
                     ) : (
-                      <button
-                        onClick={() => handlePlanSelect(plan)}
-                        className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
-                      >
-                        Select
-                      </button>
+
+                      <>
+                        {
+                          plan.name === "Trial" && currentPlanId !== plan._id
+                            ?
+                            <span className="text-sm text-red-600 font-semibold">Invalid Plan</span>
+
+                            :
+                            <button
+                              onClick={() => handlePlanSelect(plan)}
+                              className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+                            >
+                              Select
+                            </button>
+                        }
+                      </>
+
                     )}
                   </div>
                 </div>
