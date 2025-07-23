@@ -2,9 +2,10 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import { useEffect, useState, useRef } from "react";
 import { Menu, X, ShoppingBag, User, Home, LayoutDashboard, Users, Package, CreditCard, Repeat, Tag, Settings } from "lucide-react";
-import { FaStore } from "react-icons/fa6";
+import { FaRegUser, FaStore } from "react-icons/fa6";
 import { IoIosLogOut } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
+import { RiAdminLine } from "react-icons/ri";
 
 const Navbar = () => {
   const { user, role, logout, setUserFromSession } = useAuthStore();
@@ -59,8 +60,8 @@ const Navbar = () => {
   // Guest navigation items
   const guestNavItems = [
     { path: "/", name: "Home", icon: <Home className="h-5 w-5" /> },
-    { path: "/login", name: "Login", icon: null },
-    { path: "/admin/login", name: "Admin Login", icon: null }
+    { path: "/login", name: "Login", icon: <FaRegUser className="h-5 w-5" /> },
+    { path: "/admin/login", name: "Admin Login", icon: <RiAdminLine className="h-5 w-5" /> }
   ];
 
   const currentNavItems = role === "admin" 
