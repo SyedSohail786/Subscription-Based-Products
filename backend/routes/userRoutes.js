@@ -8,7 +8,8 @@ const {
   checkDownloadAccess,
   addToLibrary,
   getOwnedProducts,
-  removeFromLibrary
+  removeFromLibrary,
+  sendOtp
 } = require("../controllers/userController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -19,11 +20,11 @@ router.get("/me", protect, getProfile);
 router.get("/dashboard", protect, getDashboard);
 router.get("/download/:productId", protect, downloadProduct);
 router.get("/subscription", protect, getSubscriptionStatus);
-router.put("/change-password", protect, changePassword);
+router.post("/reset-password", changePassword);
 router.get("/check-access/:productId", protect, checkDownloadAccess);
 router.get("/owned-products", protect, getOwnedProducts);
 router.post("/add-to-library/:productId", protect, addToLibrary);
 router.post("/remove-from-library/:productId", protect, removeFromLibrary);
-
+router.post("/send-otp", sendOtp);
 
 module.exports = router;

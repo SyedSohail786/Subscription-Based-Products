@@ -4,6 +4,8 @@ const Subscription = require("../models/Subscription");
 const bcrypt = require("bcryptjs");
 const Plan = require("../models/Plan");
 const Download = require("../models/Download");
+const Otp = require("../models/Otp");
+const nodemailer = require("nodemailer");
 
 // 👉 Get Logged In User Info
 exports.getProfile = async (req, res) => {
@@ -56,17 +58,22 @@ exports.getSubscriptionStatus = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const user = await User.findById(req.user._id);
+  const { email, otp, newPassword } = req.body;
+  const validOtp = await Otp.findOne({ email, otp });
 
-  const isMatch = await bcrypt.compare(currentPassword, user.password);
-  if (!isMatch) return res.status(400).json({ message: "Incorrect current password" });
+  if (!validOtp || validOtp.expiry < Date.now()) {
+    return res.status(400).json({ message: "Invalid or expired OTP" });
+  }
 
+  const user = await User.findOne({ email });
   user.password = await bcrypt.hash(newPassword, 10);
   await user.save();
 
-  res.status(200).json({ message: "Password changed successfully" });
+  await Otp.deleteMany({ email }); // clear OTPs after use
+
+  res.status(200).json({ message: "Password reset successful" });
 };
+
 
 
 exports.checkDownloadAccess = async (req, res) => {
@@ -183,4 +190,42 @@ exports.removeFromLibrary = async (req, res) => {
   user.ownedProducts = user.ownedProducts.filter(product => product._id.toString() !== req.params.productId);
   await user.save();
   res.status(200).json({ message: "Product removed from your library." });
+};
+
+
+
+
+
+
+
+exports.sendOtp = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await Otp.deleteMany({ email }); // remove old OTPs
+
+  await Otp.create({
+    email,
+    otp,
+    expiry: Date.now() + 10 * 60 * 1000, // 10 mins
+  });
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    to: email,
+    subject: "Reset Password OTP",
+    html: `<p>Your OTP is <b>${otp}</b>. It will expire in 10 minutes.</p>`,
+  });
+
+  res.status(200).json({ message: "OTP sent to your email" });
 };

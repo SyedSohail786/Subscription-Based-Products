@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useAuthStore from "../../store/authStore";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -23,6 +23,7 @@ const Register = () => {
       <input placeholder="Email" onChange={e => setForm({ ...form, email: e.target.value })} className="block mb-2 w-full p-2" />
       <input type="password" placeholder="Password" onChange={e => setForm({ ...form, password: e.target.value })} className="block mb-4 w-full p-2" />
       <button onClick={handleRegister} className="bg-green-600 text-white px-4 py-2">Register</button>
+      <p className="text-sm text-gray-500 mt-4">Already have an account? <Link to="/login">Login</Link></p>
     </div>
   );
 };
