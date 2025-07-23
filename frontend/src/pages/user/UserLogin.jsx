@@ -6,17 +6,23 @@ import toast from "react-hot-toast";
 const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isLoading) return; // Prevent multiple submissions
+    
+    setIsLoading(true);
     try {
       await login({ email, password }, "user");
       navigate("/");
       toast.success("Login successful");
     } catch(err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || "Login failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,6 +48,7 @@ const UserLogin = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -57,6 +64,7 @@ const UserLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -64,14 +72,16 @@ const UserLogin = () => {
               <button
                 type="button"
                 onClick={() => navigate("/register")}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                className={`text-sm text-blue-600 hover:text-blue-800 font-medium hover:underline ${isLoading ? 'pointer-events-none opacity-70' : ''}`}
+                disabled={isLoading}
               >
                 Create an account
               </button>
               <button
                 type="button"
                 onClick={() => navigate("/forgot-password")}
-                className="text-sm text-gray-600 hover:text-gray-800 font-medium hover:underline"
+                className={`text-sm text-gray-600 hover:text-gray-800 font-medium hover:underline ${isLoading ? 'pointer-events-none opacity-70' : ''}`}
+                disabled={isLoading}
               >
                 Forgot password?
               </button>
@@ -79,31 +89,22 @@ const UserLogin = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg shadow-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={isLoading}
+              className={`w-full ${isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium py-3 px-4 rounded-lg shadow-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center`}
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
-
-          {/* <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  New to our platform?
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigate("/register")}
-              className="mt-4 w-full bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Register Now
-            </button>
-          </div> */}
         </div>
       </div>
     </div>

@@ -66,7 +66,8 @@ exports.changePassword = async (req, res) => {
   }
 
   const user = await User.findOne({ email });
-  user.password = await bcrypt.hash(newPassword, 10);
+  if (!user) return res.status(404).json({ message: "User not found" });
+  user.password = newPassword;
   await user.save();
 
   await Otp.deleteMany({ email }); // clear OTPs after use
