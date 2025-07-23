@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const Plan = require("../models/Plan");
 const Download = require("../models/Download");
 const Otp = require("../models/Otp");
-const nodemailer = require("nodemailer");
+const sendEmail = require("../utils/sendEmail");
 
 // 👉 Get Logged In User Info
 exports.getProfile = async (req, res) => {
@@ -213,19 +213,7 @@ exports.sendOtp = async (req, res) => {
     expiry: Date.now() + 10 * 60 * 1000, // 10 mins
   });
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    to: email,
-    subject: "Reset Password OTP",
-    html: `<p>Your OTP is <b>${otp}</b>. It will expire in 10 minutes.</p>`,
-  });
+  await sendEmail(email, "Reset Password OTP", `<p>Your OTP is <b>${otp}</b>. It will expire in 10 minutes.</p>`);
 
   res.status(200).json({ message: "OTP sent to your email" });
 };
