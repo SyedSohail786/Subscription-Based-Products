@@ -45,7 +45,7 @@ export default function AdminProductsPage() {
     value: cat._id,
     label: cat.name
   }));
-console.log(categoryOptions)
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -176,6 +176,7 @@ console.log(categoryOptions)
       setEditId(null);
       setEditForm({});
       setEditPreview({ file: '', image: '' });
+      fetchProducts();
     } catch (error) {
       console.error("Failed to update product:", error);
     }

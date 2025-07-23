@@ -1,24 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import { useEffect, useState, useRef } from "react";
-import { Menu, X, ChevronDown, ChevronUp, ShoppingBag, User, Home } from "lucide-react";
+import { Menu, X, ShoppingBag, User, Home, LayoutDashboard, Users, Package, CreditCard, Repeat, Tag, Settings } from "lucide-react";
 import { FaStore } from "react-icons/fa6";
+import { IoIosLogOut } from "react-icons/io";
+import { CgProfile } from "react-icons/cg";
 
 const Navbar = () => {
   const { user, role, logout, setUserFromSession } = useAuthStore();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navbarRef = useRef(null);
 
   useEffect(() => {
     setUserFromSession();
     
-    // Add click outside listener
     const handleClickOutside = (event) => {
       if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setAdminDropdownOpen(false);
+        setMobileOpen(false);
       }
     };
 
@@ -31,305 +30,155 @@ const Navbar = () => {
   const logoutFunction = async () => {
     const res = await logout();
     res && navigate("/login");
-    setIsOpen(false);
-    setAdminDropdownOpen(false);
+    setMobileOpen(false);
   };
 
   const nav = () => {
     role === "admin" ? navigate("/admin/dashboard") : navigate("/");
-    setIsOpen(false);
-    setAdminDropdownOpen(false);
+    setMobileOpen(false);
   };
 
-  const toggleAdminDropdown = () => {
-    setAdminDropdownOpen(!adminDropdownOpen);
-  };
+  // Admin navigation items
+  const adminNavItems = [
+    { path: "/admin/dashboard", name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { path: "/admin/users", name: "Users", icon: <Users className="h-5 w-5" /> },
+    { path: "/admin/products", name: "Products", icon: <Package className="h-5 w-5" /> },
+    { path: "/admin/plans", name: "Plans", icon: <CreditCard className="h-5 w-5" /> },
+    { path: "/admin/subscriptions", name: "Subscriptions", icon: <Repeat className="h-5 w-5" /> },
+    { path: "/admin/coupons", name: "Coupons", icon: <Tag className="h-5 w-5" /> },
+    { path: "/admin/me", name: "My Profile", icon: <CgProfile className="h-5 w-5" /> }
+  ];
+
+  // User navigation items
+  const userNavItems = [
+    { path: "/", name: "Home", icon: <Home className="h-5 w-5" /> },
+    { path: "/my-bag", name: "My Bag", icon: <ShoppingBag className="h-5 w-5" /> },
+    { path: "/profile", name: "Profile", icon: <User className="h-5 w-5" /> }
+  ];
+
+  // Guest navigation items
+  const guestNavItems = [
+    { path: "/", name: "Home", icon: <Home className="h-5 w-5" /> },
+    { path: "/login", name: "Login", icon: null },
+    { path: "/admin/login", name: "Admin Login", icon: null }
+  ];
+
+  const currentNavItems = role === "admin" 
+    ? adminNavItems 
+    : user 
+      ? userNavItems 
+      : guestNavItems;
 
   return (
-    <nav 
-      ref={navbarRef}
-      className="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg sticky top-0 z-50"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo/Brand */}
-          <div
-            className="flex-shrink-0 flex items-center cursor-pointer group"
-            onClick={nav}
-          >
-            <FaStore className="h-6 w-6 mr-1 text-white" />
-            <span className="text-white text-xl font-bold tracking-tight group-hover:scale-105 transition-transform">
-              {role === "admin" ? "Digital Store Admin" : "Digital Product Store"}
-            </span>
-          </div>
+    <>
+      {/* Desktop Navbar */}
+      <nav 
+        ref={navbarRef}
+        className="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg sticky top-0 z-50"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo/Brand */}
+            <div
+              className="flex-shrink-0 flex items-center cursor-pointer group"
+              onClick={nav}
+            >
+              <FaStore className="h-6 w-6 mr-2 text-white" />
+              <span className="text-white text-xl font-bold tracking-tight hidden md:block">
+                {role === "admin" ? "Admin Panel" : "Digital Product Store"}
+              </span>
+            </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-2">
-              {role === "admin" ? (
-                <>
-                  <div className="relative">
-                    <button
-                      onClick={toggleAdminDropdown}
-                      className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
-                    >
-                      Admin Menu
-                      {adminDropdownOpen ? (
-                        <ChevronUp className="ml-1 h-4 w-4 transition-transform" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4 transition-transform" />
-                      )}
-                    </button>
-                    {adminDropdownOpen && (
-                      <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white py-1 animate-fadeIn">
-                        <Link
-                          to="/admin/dashboard"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">📊</span> Dashboard
-                        </Link>
-                        <Link
-                          to="/admin/users"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">👥</span> Users
-                        </Link>
-                        <Link
-                          to="/admin/products"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">🛍️</span> Products
-                        </Link>
-                        <Link
-                          to="/admin/plans"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">📋</span> Plans
-                        </Link>
-                        <Link
-                          to="/admin/subscriptions"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">🔄</span> Subscriptions
-                        </Link>
-                        <Link
-                          to="/admin/coupons"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">🎟️</span> Coupons
-                        </Link>
-                        <Link
-                          to="/admin/me"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
-                          onClick={() => setAdminDropdownOpen(false)}
-                        >
-                          <span className="mr-2">👤</span> My Profile
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={logoutFunction}
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : user ? (
-                <>
-                  <Link
-                    to="/"
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
-                  >
-                    <Home className="h-4 w-4 mr-1" /> Home
-                  </Link>
-                  <Link
-                    to="/my-bag"
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
-                  >
-                    <ShoppingBag className="h-4 w-4 mr-1" /> My Bag
-                  </Link>
-                  <Link
-                    to="/profile"
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
-                  >
-                    <User className="h-4 w-4 mr-1" /> Profile
-                  </Link>
-                  <button
-                    onClick={logoutFunction}
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/"
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
-                  >
-                    <Home className="h-4 w-4 mr-1" /> Home
-                  </Link>
-                  <Link
-                    to="/login"
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/admin/login"
-                    className="text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Admin Login
-                  </Link>
-                </>
+            {/* Desktop Navigation - Icons Only */}
+            <div className="hidden md:flex items-center space-x-4">
+              {currentNavItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="text-white hover:bg-indigo-700 p-3 rounded-full flex items-center transition-colors"
+                  title={item.name} // Show tooltip on hover
+                >
+                  {item.icon || item.name.charAt(0)}
+                </Link>
+              ))}
+              {user && (
+                <button
+                  onClick={logoutFunction}
+                  className="text-white hover:bg-indigo-700 p-3 rounded-full transition-colors"
+                  title="Logout"
+                >
+                  <IoIosLogOut className="h-5 w-5 mr-1" />
+                </button>
               )}
             </div>
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-indigo-700 focus:outline-none transition-colors"
-              aria-label="Main menu"
-              aria-expanded={isOpen}
-            >
-              {isOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-indigo-700 focus:outline-none transition-colors"
+                aria-label="Open menu"
+              >
                 <Menu className="h-6 w-6" />
-              )}
-            </button>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Navigation */}
-      <div className={`md:hidden bg-indigo-700 transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-screen" : "max-h-0"}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {role === "admin" ? (
-            <>
-              <Link
-                to="/admin/dashboard"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">📊</span> Dashboard
-              </Link>
-              <Link
-                to="/admin/users"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">👥</span> Users
-              </Link>
-              <Link
-                to="/admin/products"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">🛍️</span> Products
-              </Link>
-              <Link
-                to="/admin/plans"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">📋</span> Plans
-              </Link>
-              <Link
-                to="/admin/subscriptions"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">🔄</span> Subscriptions
-              </Link>
-              <Link
-                to="/admin/coupons"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">🎟️</span> Coupons
-              </Link>
-              <Link
-                to="/admin/me"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mr-2">👤</span> My Profile
-              </Link>
-              <button
-                onClick={logoutFunction}
-                className="w-full text-left flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-              >
-                <span className="mr-2">🚪</span> Logout
-              </button>
-            </>
-          ) : user ? (
-            <>
-              <Link
-                to="/"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <Home className="h-5 w-5 mr-2" /> Home
-              </Link>
-              <Link
-                to="/my-bag"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <ShoppingBag className="h-5 w-5 mr-2" /> My Bag
-              </Link>
-              <Link
-                to="/profile"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <User className="h-5 w-5 mr-2" /> Profile
-              </Link>
-              <button
-                onClick={logoutFunction}
-                className="w-full text-left flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-              >
-                <span className="mr-2">🚪</span> Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/"
-                className="flex items-center text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <Home className="h-5 w-5 mr-2" /> Home
-              </Link>
-              <Link
-                to="/login"
-                className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                to="/admin/login"
-                className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Admin Login
-              </Link>
-            </>
+      {/* Mobile Sidebar - Icons + Text */}
+      <div
+        className={`fixed inset-y-0 left-0 w-64 bg-indigo-800 text-white transform ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out z-50`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-indigo-700">
+          <div className="flex items-center">
+            <FaStore className="h-6 w-6 mr-2" />
+            <span className="text-xl font-bold">
+              {role === "admin" ? "Admin Panel" : "Digital Store"}
+            </span>
+          </div>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="text-white hover:text-indigo-200"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="p-4 space-y-2">
+          {currentNavItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="flex items-center p-3 rounded hover:bg-indigo-700 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {item.icon && <span className="mr-3">{item.icon}</span>}
+              {!item.icon && <span className="mr-3">{item.name.charAt(0)}</span>}
+              <span>{item.name}</span>
+            </Link>
+          ))}
+          {user && (
+            <button
+              onClick={logoutFunction}
+              className="w-full flex items-center p-3 rounded hover:bg-indigo-700 transition-colors text-left"
+            >
+              <IoIosLogOut className="h-5 w-5 mr-1" /> Logout
+            </button>
           )}
         </div>
       </div>
-    </nav>
+
+      {/* Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+    </>
   );
 };
 
