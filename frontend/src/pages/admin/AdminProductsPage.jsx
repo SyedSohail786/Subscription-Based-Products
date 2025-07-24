@@ -30,27 +30,44 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState({
     title: '',
     description: '',
-    category: '',
-    subcategory: '',
+    category: null,
+    subcategory: null,
     price: '',
     tags: [],
     file: null,
     image: null,
+    tagsInput: '',
+    about: '',
+    author: '',
+    releaseDate: '',
+    returnAvailable: 'false'
   });
 
   const [preview, setPreview] = useState({ file: '', image: '' });
   const [editPreview, setEditPreview] = useState({ file: '', image: '' });
   const [editId, setEditId] = useState(null);
-  const [editForm, setEditForm] = useState({});
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    category: null,
+    subcategory: null,
+    price: '',
+    tags: [],
+    file: null,
+    image: null,
+    tagsInput: '',
+    about: '',
+    author: '',
+    releaseDate: '',
+    returnAvailable: 'false'
+  });
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
 
-  // Format categories for React Select
   const categoryOptions = categories?.map(cat => ({
     value: cat?._id,
     label: cat?.name
   })) || [];
 
-  // When a category is selected in create form
   useEffect(() => {
     if (form.category) {
       const cat = categories?.find(c => c?._id === form.category?.value);
@@ -58,7 +75,6 @@ export default function AdminProductsPage() {
     }
   }, [form.category, categories]);
 
-  // When editing an existing product
   useEffect(() => {
     if (editForm.category) {
       const cat = categories?.find(c => c?._id === editForm.category?.value);
@@ -88,7 +104,7 @@ export default function AdminProductsPage() {
     try {
       setIsCreating(true);
       const formData = new FormData();
-      
+
       Object.keys(form).forEach((key) => {
         if (key === 'tags') {
           formData.append(key, JSON.stringify(form[key]?.map(tag => tag?.value) || []));
@@ -97,7 +113,6 @@ export default function AdminProductsPage() {
             formData.append(key, form[key].value);
           }
         } else if (key === 'subcategory') {
-          // Handle subcategory value extraction
           if (form[key]?.value) {
             formData.append(key, form[key].value);
           } else if (typeof form[key] === 'string') {
@@ -110,16 +125,20 @@ export default function AdminProductsPage() {
 
       await createProduct(formData);
 
-      // Reset form
       setForm({
         title: '',
         description: '',
-        category: '',
-        subcategory: '',
+        category: null,
+        subcategory: null,
         price: '',
         tags: [],
         file: null,
         image: null,
+        tagsInput: '',
+        about: '',
+        author: '',
+        releaseDate: '',
+        returnAvailable: 'false'
       });
       setPreview({ file: '', image: '' });
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -144,30 +163,30 @@ export default function AdminProductsPage() {
   };
 
   const handleCategoryChange = (selectedOption) => {
-    setForm(prev => ({ ...prev, category: selectedOption, subcategory: '' }));
+    setForm(prev => ({ ...prev, category: selectedOption, subcategory: null }));
   };
+
   const handleEditCategoryChange = (selectedOption) => {
-    setEditForm(prev => ({ ...prev, category: selectedOption, subcategory: '' }));
+    setEditForm(prev => ({ ...prev, category: selectedOption, subcategory: null }));
   };
 
   const handleSubcategoryChange = (selectedOption) => {
-    // Store just the value if selectedOption exists, otherwise store empty string
-    setForm(prev => ({ 
-      ...prev, 
-      subcategory: selectedOption ? selectedOption.value : '' 
+    setForm(prev => ({
+      ...prev,
+      subcategory: selectedOption || null
     }));
   };
 
   const startEdit = (product) => {
     if (!product) return;
-    
+
     setEditId(product._id);
     setEditForm({
       title: product.title || '',
       description: product.description || '',
-      category: product.category ? { 
-        value: product.category._id, 
-        label: product.category.name 
+      category: product.category ? {
+        value: product.category._id,
+        label: product.category.name
       } : null,
       subcategory: product.subcategory ? {
         value: product.subcategory,
@@ -177,6 +196,11 @@ export default function AdminProductsPage() {
       tags: product.tags?.map(tag => ({ value: tag, label: tag })) || [],
       file: null,
       image: null,
+      tagsInput: product.tags?.join(', ') || '',
+      about: product.about || '',
+      author: product.author || '',
+      releaseDate: product.releaseDate || '',
+      returnAvailable: product.returnAvailable ? 'true' : 'false'
     });
     setEditPreview({
       file: product.fileUrl ? `${BACKEND_URL}/${product.fileUrl}` : '',
@@ -199,7 +223,7 @@ export default function AdminProductsPage() {
   const handleEditSubcategoryChange = (selectedOption) => {
     setEditForm(prev => ({
       ...prev,
-      subcategory: selectedOption ? selectedOption.value : ''
+      subcategory: selectedOption || null
     }));
   };
 
@@ -218,7 +242,6 @@ export default function AdminProductsPage() {
               formData.append(key, editForm[key].value);
             }
           } else if (key === 'subcategory') {
-            // Handle subcategory value extraction
             if (editForm[key]?.value) {
               formData.append(key, editForm[key].value);
             } else if (typeof editForm[key] === 'string') {
@@ -243,7 +266,21 @@ export default function AdminProductsPage() {
 
   const cancelEdit = () => {
     setEditId(null);
-    setEditForm({});
+    setEditForm({
+      title: '',
+      description: '',
+      category: null,
+      subcategory: null,
+      price: '',
+      tags: [],
+      file: null,
+      image: null,
+      tagsInput: '',
+      about: '',
+      author: '',
+      releaseDate: '',
+      returnAvailable: 'false'
+    });
     setEditPreview({ file: '', image: '' });
   };
 
@@ -257,7 +294,6 @@ export default function AdminProductsPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Toggle Header */}
       <div className="flex border-b border-gray-200 mb-6">
         <button
           onClick={() => setSection('products')}
@@ -281,7 +317,6 @@ export default function AdminProductsPage() {
         <AdminCategories />
       ) : (
         <>
-          {/* CREATE/EDIT PRODUCT FORM */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               {editId ? 'Edit Product' : 'Add New Product'}
@@ -303,7 +338,7 @@ export default function AdminProductsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
                 <input
                   name="shortDescription"
-                  value={editId ? editForm.shortDescription : form.shortDescription || ''}
+                  value={editId ? editForm.shortDescription || '' : form.shortDescription || ''}
                   onChange={editId ? handleEditChange : handleFormChange}
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 />
@@ -321,7 +356,6 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              {/* Subcategory */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
                 <Select
@@ -339,7 +373,7 @@ export default function AdminProductsPage() {
                 <textarea
                   name="about"
                   rows="3"
-                  value={editId ? editForm.about : form.about || ''}
+                  value={editId ? editForm.about || '' : form.about || ''}
                   onChange={editId ? handleEditChange : handleFormChange}
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 />
@@ -349,7 +383,7 @@ export default function AdminProductsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Author Name</label>
                 <input
                   name="author"
-                  value={editId ? editForm.author : form.author || ''}
+                  value={editId ? editForm.author || '' : form.author || ''}
                   onChange={editId ? handleEditChange : handleFormChange}
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 />
@@ -360,8 +394,9 @@ export default function AdminProductsPage() {
                 <input
                   type="date"
                   name="releaseDate"
-                  value={editId ? editForm.releaseDate : form.releaseDate || ''}
+                  value={editId ? editForm.releaseDate || '' : form.releaseDate || ''}
                   onChange={editId ? handleEditChange : handleFormChange}
+                  max={new Date().toISOString().split('T')[0]} // This sets max date to today
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 />
               </div>
@@ -371,7 +406,7 @@ export default function AdminProductsPage() {
                 <input
                   type="number"
                   name="price"
-                  value={editId ? editForm.price : form.price}
+                  value={editId ? editForm.price || '' : form.price || ''}
                   onChange={editId ? handleEditChange : handleFormChange}
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                   required
@@ -382,24 +417,9 @@ export default function AdminProductsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
                 <input
                   type="text"
-                  name="tags"
+                  name="tagsInput"
                   value={editId ? editForm.tagsInput || '' : form.tagsInput || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (editId) {
-                      setEditForm({
-                        ...editForm,
-                        tagsInput: value,
-                        tags: createTagOptions(value)
-                      });
-                    } else {
-                      setForm({
-                        ...form,
-                        tagsInput: value,
-                        tags: createTagOptions(value)
-                      });
-                    }
-                  }}
+                  onChange={editId ? handleEditChange : handleFormChange}
                   placeholder="e.g. fiction, thriller, AI"
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 />
@@ -409,7 +429,7 @@ export default function AdminProductsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Return Available</label>
                 <select
                   name="returnAvailable"
-                  value={editId ? editForm.returnAvailable : form.returnAvailable || 'false'}
+                  value={editId ? editForm.returnAvailable || 'false' : form.returnAvailable || 'false'}
                   onChange={editId ? handleEditChange : handleFormChange}
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 >
@@ -511,7 +531,6 @@ export default function AdminProductsPage() {
             </form>
           </div>
 
-          {/* PRODUCT LIST */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <h2 className="text-xl font-semibold p-6 text-gray-800">Product List</h2>
 

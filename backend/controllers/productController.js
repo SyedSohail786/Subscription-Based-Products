@@ -70,25 +70,62 @@ exports.createProduct = async (req, res) => {
 
 // ✅ Update product
 exports.updateProduct = async (req, res) => {
-  const { title, description, category, price, tags } = req.body;
+  try {
+    const { 
+      title, 
+      description, 
+      category, 
+      subcategory,
+      price, 
+      tags,
+      about,
+      author,
+      releaseDate,
+      returnAvailable,
+      shortDescription
+    } = req.body;
 
-  const fileUrl = req.files?.file?.[0]?.path;
-  const imageUrl = req.files?.image?.[0]?.path;
+    const fileUrl = req.files?.file?.[0]?.path;
+    const imageUrl = req.files?.image?.[0]?.path;
 
-  const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).json({ message: "Product not found" });
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
 
-  product.title = title || product.title;
-  product.category = category || product.category;
-  product.price = price || product.price;
-  product.tags = tags || product.tags;
-  product.fileUrl = fileUrl || product.fileUrl;
-  product.imageUrl = imageUrl || product.imageUrl;
+    // Update fields
+    product.title = title || product.title;
+    product.description = description || product.description;
+    product.shortDescription = shortDescription || product.shortDescription;
+    product.category = category || product.category;
+    product.subcategory = subcategory || product.subcategory;
+    product.price = price || product.price;
+    product.tags = tags ? JSON.parse(tags) : product.tags;
+    product.about = about || product.about;
+    product.author = author || product.author;
+    product.releaseDate = releaseDate || product.releaseDate;
+    product.returnAvailable = returnAvailable === 'true' || product.returnAvailable;
+    
+    // Only update file/image URLs if new files were uploaded
+    if (fileUrl) {
+      product.fileUrl = fileUrl;
+    }
+    if (imageUrl) {
+      product.imageUrl = imageUrl;
+    }
 
-  const updated = await product.save();
-  res.json(updated);
+    const updatedProduct = await product.save();
+    
+    res.json({
+      ...updatedProduct._doc,
+      fileUrl: updatedProduct.fileUrl ? updatedProduct.fileUrl : undefined,
+      imageUrl: updatedProduct.imageUrl ? updatedProduct.imageUrl : undefined
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
-
 // ✅ Delete product
 exports.deleteProduct = async (req, res) => {
   const product = await Product.findById(req.params.id);

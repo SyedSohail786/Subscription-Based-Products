@@ -31,13 +31,13 @@ export default function App() {
         <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
         <Route path="/admin/login" element={role === "admin" ? <Navigate to="/admin/dashboard" /> : <AdminLogin />} />
         <Route path="/forgot-password" element={<ChangePassword/>} />
+        <Route path="/product/:id" element={<ProductDetail />} />
 
         {/* Protected User Routes */}
          {role === "user" && (
           <>
             <Route path="/profile" element={<UserProfile/>}/>
             <Route path="/my-bag" element={ <MyBag/> } />
-            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/payment" element={<Payment />} />
           </>
         )}
