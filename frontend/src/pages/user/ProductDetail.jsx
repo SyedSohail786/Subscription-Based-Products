@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import moment from "moment";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -86,11 +87,19 @@ const ProductDetail = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <img src={`${BACKEND_URL}/${product.imageUrl}`} alt={product.name} className="w-full h-auto rounded" />
+        <img src={`${BACKEND_URL}/${product.imageUrl}`} alt={product.title} className="w-full h-auto rounded" />
 
         <div>
-          <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
+          <h2 className="text-2xl font-bold mb-2">{product.title}</h2>
+          <p className="text-gray-600 mb-4">{product.author}</p>
+
+          <p className="text-gray-600 mb-4">{product.shortDescription}</p>
           <p className="text-gray-600 mb-4">{product.about}</p>
+          <p className="text-gray-600 mb-4">{product.tags.join(', ')}</p>
+          <p className="text-gray-600 mb-4">₹{product.price}</p>
+          <p className="text-gray-600 mb-4">{moment(product.releaseDate).format('DD/MM/YYYY')}</p>
+
+
 
           <div className="flex gap-4">
             <button
