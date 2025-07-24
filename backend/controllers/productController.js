@@ -17,7 +17,7 @@ exports.createProduct = async (req, res) => {
       category,
       subcategory,
       price,
-      tags,
+      tagsInput,
       author,
       releaseDate,
       returnAvailable,
@@ -33,7 +33,7 @@ exports.createProduct = async (req, res) => {
       !category ||
       !subcategory ||
       !price ||
-      !tags ||
+      !tagsInput ||
       !author ||
       !releaseDate ||
       !about
@@ -47,7 +47,7 @@ exports.createProduct = async (req, res) => {
       category,
       subcategory,
       price,
-      tags: typeof tags === "string" ? tags.split(",") : tags,
+      tags: typeof tagsInput === "string" ? tagsInput.split(",") : tagsInput,
       author,
       releaseDate,
       returnAvailable: returnAvailable === 'true' || returnAvailable === true,

@@ -5,6 +5,7 @@ import { FiEdit2, FiTrash2, FiPlus, FiX, FiCheck, FiFile, FiImage } from 'react-
 import { motion } from 'framer-motion';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import toast from 'react-hot-toast';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const animatedComponents = makeAnimated();
@@ -143,8 +144,11 @@ export default function AdminProductsPage() {
       setPreview({ file: '', image: '' });
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (imageInputRef.current) imageInputRef.current.value = '';
+      toast.success('Product Added Successfully');
+      fetchProducts();
     } catch (error) {
       console.error("Failed to create product:", error);
+      toast.error('Failed to add product');
     } finally {
       setIsCreating(false);
     }
@@ -257,8 +261,11 @@ export default function AdminProductsPage() {
 
       await updateProduct(editId, formData);
       cancelEdit();
+      toast.success('Product Updated Successfully');
+      fetchProducts();
     } catch (error) {
       console.error("Failed to update product:", error);
+      toast.error('Failed to update product');
     } finally {
       setIsUpdating(false);
     }
