@@ -24,7 +24,6 @@ exports.createProduct = async (req, res) => {
       about,
     } = req.body;
 
-    console.log(subcategory)
     const fileUrl = req.files?.file?.[0]?.path;
     const imageUrl = req.files?.image?.[0]?.path;
 

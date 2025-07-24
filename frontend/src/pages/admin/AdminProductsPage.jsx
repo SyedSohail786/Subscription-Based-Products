@@ -146,6 +146,9 @@ export default function AdminProductsPage() {
   const handleCategoryChange = (selectedOption) => {
     setForm(prev => ({ ...prev, category: selectedOption, subcategory: '' }));
   };
+  const handleEditCategoryChange = (selectedOption) => {
+    setEditForm(prev => ({ ...prev, category: selectedOption, subcategory: '' }));
+  };
 
   const handleSubcategoryChange = (selectedOption) => {
     // Store just the value if selectedOption exists, otherwise store empty string
