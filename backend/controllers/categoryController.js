@@ -42,22 +42,43 @@ exports.getCategories = async (req, res) => {
 
 exports.updateCategory = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, subcategories } = req.body;
     const { id } = req.params;
+
+    // Validation
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: "Name is required" });
+      return res.status(400).json({ error: "Category name is required" });
     }
 
-    const exists = await Category.findOne({ name: name.trim(), _id: { $ne: id } });
+    // Check if category with same name already exists (excluding current category)
+    const exists = await Category.findOne({ 
+      name: name.trim(), 
+      _id: { $ne: id } 
+    });
     if (exists) {
       return res.status(400).json({ error: "Category already exists" });
     }
 
-    const category = await Category.findByIdAndUpdate(id, { name: name.trim() }, { new: true });
-    if (!category) {
+    // Process subcategories
+    const cleanedSubcategories = Array.isArray(subcategories)
+      ? subcategories.map(sub => sub.trim()).filter(Boolean)
+      : [];
+
+    // Update category
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      {
+        name: name.trim(),
+        subcategories: cleanedSubcategories
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedCategory) {
       return res.status(404).json({ error: "Category not found" });
     }
-    res.json(category);
+
+    res.json(updatedCategory);
   } catch (err) {
     console.error("updateCategory error:", err);
     res.status(500).json({ error: "Server error" });
