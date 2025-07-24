@@ -2,9 +2,10 @@ const Category = require("../models/Category");
 
 exports.createCategory = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, subcategories } = req.body;
+
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: "Name is required" });
+      return res.status(400).json({ error: "Category name is required" });
     }
 
     const exists = await Category.findOne({ name: name.trim() });
@@ -12,13 +13,22 @@ exports.createCategory = async (req, res) => {
       return res.status(400).json({ error: "Category already exists" });
     }
 
-    const category = await Category.create({ name: name.trim() });
+    const cleanedSubcategories = Array.isArray(subcategories)
+      ? subcategories.map(sub => sub.trim()).filter(Boolean)
+      : [];
+
+    const category = await Category.create({
+      name: name.trim(),
+      subcategories: cleanedSubcategories,
+    });
+
     res.status(201).json(category);
   } catch (err) {
     console.error("createCategory error:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 exports.getCategories = async (req, res) => {
   try {
@@ -65,5 +75,18 @@ exports.deleteCategory = async (req, res) => {
   } catch (err) {
     console.error("deleteCategory error:", err);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.getCategoryById = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json(category);
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

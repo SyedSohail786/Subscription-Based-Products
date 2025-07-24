@@ -86,7 +86,7 @@ const Navbar = () => {
             >
               <FaStore className="h-6 w-6 mr-2 text-white" />
               <span className="text-white text-xl font-bold tracking-tight hidden md:block">
-                {role === "admin" ? "Admin Panel" : "Digital Product Store"}
+                {role === "admin" ? "Admin Panel" : role === "user" ? "Digital Product Store" : "Digital Product Store"}
               </span>
             </div>
 
@@ -137,7 +137,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <FaStore className="h-6 w-6 mr-2" />
             <span className="text-xl font-bold">
-              {role === "admin" ? "Admin Panel" : "Digital Store"}
+              {role === "admin" ? "Admin Panel" : role === "user" ? "Digital Store" : "Digital Store"}
             </span>
           </div>
           <button

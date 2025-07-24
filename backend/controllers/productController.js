@@ -11,22 +11,47 @@ exports.getProductById = async (req, res) => {
 // ✅ Create product (Admin)
 exports.createProduct = async (req, res) => {
   try {
-    const { title, description, category, price, tags } = req.body;
+    const {
+      title,
+      shortDescription,
+      category,
+      subcategory,
+      price,
+      tags,
+      author,
+      releaseDate,
+      returnAvailable,
+      about,
+    } = req.body;
+
     const fileUrl = req.files?.file?.[0]?.path;
     const imageUrl = req.files?.image?.[0]?.path;
-    console.log(title, description, category, price, tags)
-    if (!title || !description || !category || !price || !tags) {
+
+    if (
+      !title ||
+      !shortDescription ||
+      !category ||
+      !subcategory ||
+      !price ||
+      !tags ||
+      !author ||
+      !releaseDate ||
+      !about
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-
-
     const product = new Product({
       title,
-      description,
+      shortDescription,
       category,
+      subcategory,
       price,
-      tags: typeof tags === 'string' ? tags.split(',') : tags,
+      tags: typeof tags === "string" ? tags.split(",") : tags,
+      author,
+      releaseDate,
+      returnAvailable: returnAvailable === 'true' || returnAvailable === true,
+      about,
       fileUrl,
       imageUrl,
     });
@@ -41,6 +66,8 @@ exports.createProduct = async (req, res) => {
 
 
 
+
+
 // ✅ Update product
 exports.updateProduct = async (req, res) => {
   const { title, description, category, price, tags } = req.body;
@@ -52,7 +79,6 @@ exports.updateProduct = async (req, res) => {
   if (!product) return res.status(404).json({ message: "Product not found" });
 
   product.title = title || product.title;
-  product.description = description || product.description;
   product.category = category || product.category;
   product.price = price || product.price;
   product.tags = tags || product.tags;
@@ -82,7 +108,7 @@ exports.getAllProducts = async (req, res) => {
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
+        { shortDescription: { $regex: search, $options: "i" } },
       ];
     }
 
