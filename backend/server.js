@@ -29,7 +29,7 @@ app.use("/api/cart", require("./routes/cartRoutes"));
 app.use("/api/categories", require("./routes/categoryRoutes.js"));
 app.use('/api/plans', require('./routes/planRoutes'));
 app.use('/api/download', require('./routes/download'));
-
+app.use('/api/comments', require('./routes/commentRoutes'));
 
 
 const PORT = process.env.PORT || 5000;

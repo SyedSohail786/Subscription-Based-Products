@@ -75,8 +75,6 @@ exports.changePassword = async (req, res) => {
   res.status(200).json({ message: "Password reset successful" });
 };
 
-
-
 exports.checkDownloadAccess = async (req, res) => {
   try {
     const userId = req.userId;
@@ -180,7 +178,6 @@ exports.addToLibrary = async (req, res) => {
   }
 };
 
-
 exports.getOwnedProducts = async (req, res) => {
   const user = await User.findById(req.userId).populate("ownedProducts", "_id");
   res.json({ ownedProducts: user.ownedProducts });
@@ -192,12 +189,6 @@ exports.removeFromLibrary = async (req, res) => {
   await user.save();
   res.status(200).json({ message: "Product removed from your library." });
 };
-
-
-
-
-
-
 
 exports.sendOtp = async (req, res) => {
   const { email } = req.body;
