@@ -96,6 +96,13 @@ export default function AdminProductsPage() {
           if (form[key]?.value) {
             formData.append(key, form[key].value);
           }
+        } else if (key === 'subcategory') {
+          // Handle subcategory value extraction
+          if (form[key]?.value) {
+            formData.append(key, form[key].value);
+          } else if (typeof form[key] === 'string') {
+            formData.append(key, form[key]);
+          }
         } else if (form[key] !== null && form[key] !== undefined) {
           formData.append(key, form[key]);
         }
@@ -137,7 +144,15 @@ export default function AdminProductsPage() {
   };
 
   const handleCategoryChange = (selectedOption) => {
-    setForm(prev => ({ ...prev, category: selectedOption }));
+    setForm(prev => ({ ...prev, category: selectedOption, subcategory: '' }));
+  };
+
+  const handleSubcategoryChange = (selectedOption) => {
+    // Store just the value if selectedOption exists, otherwise store empty string
+    setForm(prev => ({ 
+      ...prev, 
+      subcategory: selectedOption ? selectedOption.value : '' 
+    }));
   };
 
   const startEdit = (product) => {
@@ -150,6 +165,10 @@ export default function AdminProductsPage() {
       category: product.category ? { 
         value: product.category._id, 
         label: product.category.name 
+      } : null,
+      subcategory: product.subcategory ? {
+        value: product.subcategory,
+        label: product.subcategory
       } : null,
       price: product.price || '',
       tags: product.tags?.map(tag => ({ value: tag, label: tag })) || [],
@@ -174,6 +193,13 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleEditSubcategoryChange = (selectedOption) => {
+    setEditForm(prev => ({
+      ...prev,
+      subcategory: selectedOption ? selectedOption.value : ''
+    }));
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -187,6 +213,13 @@ export default function AdminProductsPage() {
           } else if (key === 'category') {
             if (editForm[key]?.value) {
               formData.append(key, editForm[key].value);
+            }
+          } else if (key === 'subcategory') {
+            // Handle subcategory value extraction
+            if (editForm[key]?.value) {
+              formData.append(key, editForm[key].value);
+            } else if (typeof editForm[key] === 'string') {
+              formData.append(key, editForm[key]);
             }
           } else if (editForm[key] instanceof File) {
             formData.append(key, editForm[key]);
@@ -252,7 +285,7 @@ export default function AdminProductsPage() {
             </h2>
 
             <form onSubmit={editId ? handleUpdate : handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title*</label>
                 <input
                   name="title"
@@ -291,15 +324,13 @@ export default function AdminProductsPage() {
                 <Select
                   options={subcategoryOptions}
                   value={editId ? editForm.subcategory : form.subcategory}
-                  onChange={selected => {
-                    if (editId) setEditForm({ ...editForm, subcategory: selected });
-                    else setForm({ ...form, subcategory: selected });
-                  }}
+                  onChange={editId ? handleEditSubcategoryChange : handleSubcategoryChange}
                   classNamePrefix="react-select"
                   isClearable
                   placeholder="Select subcategory"
                 />
               </div>
+
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">About the Book / Audio</label>
                 <textarea
@@ -370,7 +401,6 @@ export default function AdminProductsPage() {
                   className="w-full p-2.5 border border-gray-300 rounded-lg"
                 />
               </div>
-
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Return Available</label>
@@ -456,7 +486,7 @@ export default function AdminProductsPage() {
                         'Updating...'
                       ) : (
                         <>
-                          <FiCheck className="mr-2" />
+                          <FiCheck className="inline mr-2" />
                           Update Product
                         </>
                       )}
@@ -467,7 +497,7 @@ export default function AdminProductsPage() {
                         'Creating...'
                       ) : (
                         <>
-                          <FiPlus className="mr-2" />
+                          <FiPlus className="inline mr-2" />
                           Add Product
                         </>
                       )}
@@ -499,6 +529,7 @@ export default function AdminProductsPage() {
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -536,6 +567,11 @@ export default function AdminProductsPage() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
                               {product.category?.name || 'Uncategorized'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {product.subcategory || '-'}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
