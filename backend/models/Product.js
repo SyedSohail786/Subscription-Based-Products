@@ -14,7 +14,15 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     price: { type: Number, required: true },
-    tags: [String],
+    tags: { 
+      type: [String],
+      set: function(tags) {
+        // Clean tags before saving
+        return tags.map(tag => 
+          String(tag).replace(/^\[?"|"\]?$/g, '').trim()
+        );
+      }
+    },
     author: { type: String, required: true },
     releaseDate: { type: Date, required: true },
     returnAvailable: { type: Boolean, default: false },
