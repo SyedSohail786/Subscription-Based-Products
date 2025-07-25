@@ -50,8 +50,6 @@ export const useAdminProductStore = create((set) => ({
           'Content-Type': 'multipart/form-data'
         }
       });
-      
-      toast.success('Product created successfully');
       set((state) => ({ 
         products: [...state.products, res.data?.product],
         loading: false 

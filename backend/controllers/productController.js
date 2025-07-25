@@ -137,7 +137,19 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { search, category, min, max, type, sortBy, page = 1, limit = 10 } = req.query;
+    console.log("Incoming query:", req.query);
+    
+    const { 
+      search, 
+      category, 
+      subcategory, 
+      min, 
+      max, 
+      type, 
+      sortBy = 'latest', 
+      page = 1, 
+      limit = 10 
+    } = req.query;
 
     const query = {};
 
@@ -146,22 +158,30 @@ exports.getAllProducts = async (req, res) => {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
         { shortDescription: { $regex: search, $options: "i" } },
+        { author: { $regex: search, $options: "i" } }
       ];
     }
 
     // Category filter
     if (category) {
       const categoryDoc = await Category.findOne({ name: category });
+      console.log(`Category lookup for "${category}":`, categoryDoc);
+      
       if (categoryDoc) {
         query.category = categoryDoc._id;
+        
+        // Subcategory filter
+        if (subcategory) {
+          query.subcategory = subcategory;
+        }
       } else {
         return res.status(200).json({ products: [], totalPages: 0 });
       }
     }
 
-    // Tags filter
+    // Type filter (matches against tags array)
     if (type) {
-      query.tags = { $in: [type] };
+      query.tags = type; // Will match products where tags array contains this value
     }
 
     // Price filter
@@ -171,23 +191,80 @@ exports.getAllProducts = async (req, res) => {
       if (max) query.price.$lte = parseFloat(max);
     }
 
-    const sortOption = sortBy === "name" ? { title: 1 } : { createdAt: -1 };
+    // Sort options
+    let sortOption = { createdAt: -1 }; // default
+    switch(sortBy) {
+      case 'name':
+        sortOption = { title: 1 };
+        break;
+      case 'price-low':
+        sortOption = { price: 1 };
+        break;
+      case 'price-high':
+        sortOption = { price: -1 };
+        break;
+    }
 
+    // Count total matching documents
     const total = await Product.countDocuments(query);
+    console.log("Final query:", query, "Total matches:", total);
 
+    // Get paginated results
     const products = await Product.find(query)
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
-      .populate("category");
+      .populate("category", "name"); // Only populate category name
 
     const totalPages = Math.ceil(total / limit);
 
-    res.status(200).json({ products, totalPages });
+    res.status(200).json({ 
+      products, 
+      totalPages,
+      currentPage: parseInt(page),
+      totalProducts: total
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server Error", error: err.message });
+    console.error("Error in getAllProducts:", err);
+    res.status(500).json({ 
+      message: "Server Error",
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 };
 
+exports.recentlyViewed = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = req.user;
 
+    if (!user.recentlyViewed) user.recentlyViewed = [];
+
+    // Remove if already viewed
+    user.recentlyViewed = user.recentlyViewed.filter(id => id.toString() !== productId);
+
+    // Add to beginning
+    user.recentlyViewed.unshift(productId);
+
+    // Keep max 10
+    if (user.recentlyViewed.length > 10) {
+      user.recentlyViewed = user.recentlyViewed.slice(0, 10);
+    }
+
+    await user.save();
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to save view' });
+  }
+}
+
+exports.getRecentlyViewed = async (req, res) => {
+  try {
+    const user = req.user;
+    const products = await Product.find({ _id: { $in: user.recentlyViewed } });
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch recently viewed products' });
+  }
+}

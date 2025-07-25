@@ -17,6 +17,7 @@ import UserProfile from "./pages/user/UserProfile";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ChangePassword from "./pages/user/ChangePassword";
+import SubcategoryPage from "./pages/user/SubcategoryPage";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/admin/login" element={role === "admin" ? <Navigate to="/admin/dashboard" /> : <AdminLogin />} />
         <Route path="/forgot-password" element={<ChangePassword/>} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/subcategory/:name" element={<SubcategoryPage />} />
 
         {/* Protected User Routes */}
          {role === "user" && (
