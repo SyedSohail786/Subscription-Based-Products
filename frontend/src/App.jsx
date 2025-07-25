@@ -5,7 +5,7 @@ import UserLogin from "./pages/user/UserLogin";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import Navbar from "./components/Navbar";
-import Home from "./pages/user/Home";
+import Home, { CategoryPage } from "./pages/user/Home";
 import AdminPlansPage from "./pages/admin/AdminPlansPage";
 import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage";
 import AdminCoupons from "./pages/admin/AdminCoupons";
@@ -31,29 +31,30 @@ export default function App() {
         <Route path="/login" element={user ? <Navigate to="/" /> : <UserLogin />} />
         <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
         <Route path="/admin/login" element={role === "admin" ? <Navigate to="/admin/dashboard" /> : <AdminLogin />} />
-        <Route path="/forgot-password" element={<ChangePassword/>} />
+        <Route path="/forgot-password" element={<ChangePassword />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/subcategory/:name" element={<SubcategoryPage />} />
-
+        <Route path="/subcategory/:subcategory" element={<SubcategoryPage />} />
+        <Route path="/category/:category" element={<CategoryPage />} />
         {/* Protected User Routes */}
-         {role === "user" && (
+        {role === "user" && (
           <>
-            <Route path="/profile" element={<UserProfile/>}/>
-            <Route path="/my-bag" element={ <MyBag/> } />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/my-bag" element={<MyBag />} />
             <Route path="/payment" element={<Payment />} />
           </>
         )}
 
         {/* Protected Admin Routes */}
-         {role === "admin" && (
+        {role === "admin" && (
           <>
-            <Route path="/admin/dashboard" element={<AdminDashboard/>} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/admin/products" element={<AdminProductsPage />} />
-            <Route path="/admin/plans" element={<AdminPlansPage/>} />
-            <Route path="/admin/subscriptions" element={<AdminSubscriptionsPage/>} />
-            <Route path="/admin/coupons" element={<AdminCoupons/>} />
-            <Route path="/admin/me" element={<AdminProfile/>} />
+            <Route path="/admin/plans" element={<AdminPlansPage />} />
+            <Route path="/admin/subscriptions" element={<AdminSubscriptionsPage />} />
+            <Route path="/admin/coupons" element={<AdminCoupons />} />
+            <Route path="/admin/me" element={<AdminProfile />} />
           </>
         )}
 

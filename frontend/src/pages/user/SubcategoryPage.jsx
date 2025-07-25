@@ -1,73 +1,74 @@
-// SubcategoryPage.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import toast from 'react-hot-toast';
 import Select from 'react-select';
+import axios from 'axios';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+const sortOptions = [
+  { value: 'latest', label: 'Recently Added' },
+  { value: 'price-low', label: 'Price: Low to High' },
+  { value: 'price-high', label: 'Price: High to Low' },
+  { value: 'name', label: 'Name (A-Z)' }
+];
+
 const SubcategoryPage = () => {
   const { name } = useParams();
-  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [sortOption, setSortOption] = useState('recent');
+  const [sortBy, setSortBy] = useState('latest');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchSubcategoryProducts();
-  }, [name, sortOption]);
+    axios.get(`${BACKEND_URL}/api/products`, { params: { subcategory: name, sortBy } })
+      .then(res => setProducts(res.data.products || []))
+      .catch(console.error);
+  }, [name, sortBy]);
 
-  const fetchSubcategoryProducts = async () => {
-    try {
-      const res = await axios.get(`${BACKEND_URL}/api/products`, {
-        params: { subcategory: name, sort: sortOption }
-      });
-      setProducts(res.data);
-    } catch (err) {
-      toast.error('Failed to load products');
+  const sortProducts = (list) => {
+    switch (sortBy) {
+      case 'price-high': return [...list].sort((a, b) => b.price - a.price);
+      case 'price-low': return [...list].sort((a, b) => a.price - b.price);
+      case 'name': return [...list].sort((a, b) => a.title.localeCompare(b.title));
+      default: return list;
     }
   };
 
-  const sortOptions = [
-    { value: 'recent', label: 'Recently Listed' },
-    { value: 'high', label: 'High Price' },
-    { value: 'low', label: 'Low Price' }
-  ];
-
-  const handleSortChange = (option) => {
-    setSortOption(option.value);
-  };
-
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
-  };
-
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Products in "{name}"</h2>
-        <div className="w-60">
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">{name} Books</h2>
+        <div className="w-64">
           <Select
             options={sortOptions}
             defaultValue={sortOptions[0]}
-            onChange={handleSortChange}
+            onChange={(option) => setSortBy(option.value)}
           />
         </div>
       </div>
 
       {products.length === 0 ? (
-        <p className="text-gray-500">No products found.</p>
+        <div className="text-center py-12 text-gray-500">No books found in this subcategory</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {products.map((product) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+          {sortProducts(products).map((product) => (
             <div
               key={product._id}
-              className="border rounded-lg p-3 shadow hover:shadow-xl cursor-pointer"
-              onClick={() => handleProductClick(product._id)}
+              className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md cursor-pointer"
+              onClick={() => navigate(`/product/${product._id}`)}
             >
-              <img src={product.thumbnail} alt={product.title} className="h-40 w-full object-cover rounded mb-2" />
-              <h3 className="font-semibold text-lg">{product.title}</h3>
-              <p className="text-gray-600">₹{product.price}</p>
+              <div className="aspect-[2/3]">
+                <img
+                  src={`${BACKEND_URL}/${product.imageUrl}`}
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => e.target.src = 'https://via.placeholder.com/300x450?text=No+Image'}
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="text-sm font-semibold line-clamp-2">{product.title}</h3>
+                <p className="text-xs text-gray-500">{product.author}</p>
+                <p className="text-blue-600 font-semibold mt-1 text-sm">₹{product.price}</p>
+              </div>
             </div>
           ))}
         </div>

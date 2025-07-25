@@ -1,5 +1,7 @@
+
 const Category = require("../models/Category");
 const Product = require("../models/Product");
+const User = require("../models/User");
 
 // ✅ Get single product
 exports.getProductById = async (req, res) => {
@@ -162,17 +164,20 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
 
-    // Category filter
+    // Category filter - case insensitive
     if (category) {
-      const categoryDoc = await Category.findOne({ name: category });
+      const categoryRegex = new RegExp(`^${category}$`, 'i'); // Case insensitive exact match
+      const categoryDoc = await Category.findOne({ name: { $regex: categoryRegex } });
       console.log(`Category lookup for "${category}":`, categoryDoc);
-      
+
       if (categoryDoc) {
         query.category = categoryDoc._id;
         
-        // Subcategory filter
+        // Subcategory filter - case insensitive if needed
         if (subcategory) {
-          query.subcategory = subcategory;
+          query.subcategory = { $regex: new RegExp(`^${subcategory}$`, 'i') };
+        } else if (categoryDoc.subcategories) {
+          query.subcategory = { $in: categoryDoc.subcategories };
         }
       } else {
         return res.status(200).json({ products: [], totalPages: 0 });
@@ -181,7 +186,7 @@ exports.getAllProducts = async (req, res) => {
 
     // Type filter (matches against tags array)
     if (type) {
-      query.tags = type; // Will match products where tags array contains this value
+      query.tags = { $regex: new RegExp(`^${type}$`, 'i') }; // Case insensitive match
     }
 
     // Price filter
@@ -214,7 +219,7 @@ exports.getAllProducts = async (req, res) => {
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
-      .populate("category", "name"); // Only populate category name
+      .populate("category", "name");
 
     const totalPages = Math.ceil(total / limit);
 
@@ -234,37 +239,15 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-exports.recentlyViewed = async (req, res) => {
-  try {
-    const { productId } = req.body;
-    const user = req.user;
-
-    if (!user.recentlyViewed) user.recentlyViewed = [];
-
-    // Remove if already viewed
-    user.recentlyViewed = user.recentlyViewed.filter(id => id.toString() !== productId);
-
-    // Add to beginning
-    user.recentlyViewed.unshift(productId);
-
-    // Keep max 10
-    if (user.recentlyViewed.length > 10) {
-      user.recentlyViewed = user.recentlyViewed.slice(0, 10);
-    }
-
-    await user.save();
-    res.status(200).json({ success: true });
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to save view' });
-  }
+exports.recentlyViewed =async (req, res) => {
+  const user = await User.findById(req.user.id);
+  user.recentlyViewed = [req.body.productId, ...user.recentlyViewed.filter(id => id !== req.body.productId)].slice(0, 10);
+  await user.save();
+  res.sendStatus(200);
 }
 
 exports.getRecentlyViewed = async (req, res) => {
-  try {
-    const user = req.user;
-    const products = await Product.find({ _id: { $in: user.recentlyViewed } });
-    res.status(200).json(products);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch recently viewed products' });
-  }
+  const user = await User.findById(req.user.id).populate('recentlyViewed');
+  res.json({ products: user.recentlyViewed });
 }
+
