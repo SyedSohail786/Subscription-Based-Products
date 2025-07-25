@@ -48,15 +48,6 @@ const CategoryPage = () => {
                <header className="sticky top-0 z-20 bg-white shadow-sm">
                     <div className="max-w-7xl mx-auto px-4 py-4">
                          <div className="grid grid-cols-3 items-center">
-                              {/* Back button - left aligned */}
-                              
-
-                              {/* Title - centered */}
-                              
-
-                              {/* Empty div for balance - right aligned */}
-                              
-
                               <div className="flex justify-start">
                                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 capitalize whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-2">
                                         All {category}

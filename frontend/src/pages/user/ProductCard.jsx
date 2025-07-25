@@ -4,6 +4,38 @@ import { useNavigate } from "react-router-dom";
 const ProductCard = ({ product, loading = false }) => {
   const navigate = useNavigate();
 
+  const handleProductClick = () => {
+    try {
+      // Safely get and parse recently viewed items
+      const viewedStr = localStorage.getItem('recentlyViewed');
+      let viewed = [];
+      
+      if (viewedStr) {
+        try {
+          viewed = JSON.parse(viewedStr);
+          if (!Array.isArray(viewed)) {
+            viewed = []; // Reset if not an array
+          }
+        } catch (e) {
+          console.error('Error parsing recently viewed:', e);
+          viewed = [];
+        }
+      }
+
+      // Filter out any existing entry with same ID and add new one
+      const updated = [
+        product,
+        ...viewed.filter(item => item?._id !== product._id)
+      ].slice(0, 10); // Keep only last 10 items
+      
+      localStorage.setItem('recentlyViewed', JSON.stringify(updated));
+      navigate(`/product/${product._id}`);
+    } catch (error) {
+      console.error('Error handling product click:', error);
+      navigate(`/product/${product._id}`); // Still navigate even if storage fails
+    }
+  };
+
   if (loading) {
     return (
       <div className="w-full bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100">
@@ -20,7 +52,7 @@ const ProductCard = ({ product, loading = false }) => {
   return (
     <div 
       className="w-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer border border-gray-100"
-      onClick={() => navigate(`/product/${product._id}`)}
+      onClick={handleProductClick}
     >
       <div className="aspect-[2/3] relative">
         <img
