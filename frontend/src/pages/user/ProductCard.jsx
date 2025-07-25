@@ -50,11 +50,11 @@ const ProductCard = ({ product, loading = false }) => {
   }
 
   return (
-    <div 
-      className="w-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer border border-gray-100"
+     <div 
+      className="w-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer border border-gray-100 h-full flex flex-col"
       onClick={handleProductClick}
     >
-      <div className="aspect-[2/3] relative">
+      <div className="aspect-[2/3] relative flex-shrink-0">
         <img
           src={`${import.meta.env.VITE_BACKEND_URL}/${product.imageUrl}`}
           alt={product.title}
@@ -64,23 +64,27 @@ const ProductCard = ({ product, loading = false }) => {
           }}
         />
       </div>
-      <div className="p-3 sm:p-4">
+      <div className="p-3 sm:p-4 flex-grow flex flex-col">
         <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-2 mb-1 sm:mb-2">
           {product.title}
         </h3>
-        <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">{product.author}</p>
-        <div className="flex justify-between items-center">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <FiStar
-                key={i}
-                className={`w-3 h-3 sm:w-4 sm:h-4 ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}
-              />
-            ))}
+        <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3 line-clamp-1">
+          {product.author}
+        </p>
+        <div className="mt-auto">
+          <div className="flex justify-between items-center">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <FiStar
+                  key={i}
+                  className={`w-3 h-3 sm:w-4 sm:h-4 ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}
+                />
+              ))}
+            </div>
+            <span className="text-sm sm:text-base font-semibold text-blue-600">
+              ₹{product.price}
+            </span>
           </div>
-          <span className="text-sm sm:text-base font-semibold text-blue-600">
-            ₹{product.price}
-          </span>
         </div>
       </div>
     </div>
