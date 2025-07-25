@@ -5,7 +5,7 @@ import UserLogin from "./pages/user/UserLogin";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import Navbar from "./components/Navbar";
-import Home, { CategoryPage } from "./pages/user/Home";
+import Home from "./pages/user/Home";
 import AdminPlansPage from "./pages/admin/AdminPlansPage";
 import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage";
 import AdminCoupons from "./pages/admin/AdminCoupons";
@@ -18,6 +18,8 @@ import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ChangePassword from "./pages/user/ChangePassword";
 import SubcategoryPage from "./pages/user/SubcategoryPage";
+import SearchResults from "./pages/user/SearchResults";
+import CategoryPage from "./pages/user/CategoryPage";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -36,6 +38,9 @@ export default function App() {
         <Route path="/subcategory/:name" element={<SubcategoryPage />} />
         <Route path="/subcategory/:subcategory" element={<SubcategoryPage />} />
         <Route path="/category/:category" element={<CategoryPage />} />
+        <Route path="/search" element={<SearchResults />} />
+
+
         {/* Protected User Routes */}
         {role === "user" && (
           <>

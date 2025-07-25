@@ -50,3 +50,14 @@ body {
   .react-select-container .react-select__option--is-focused {
     background-color: #e0e7ff;
   }
+
+  /* Ensure header grid works perfectly */
+.grid-cols-3 {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+/* Prevent title from growing too large */
+.header-title {
+  max-width: 100%;
+  display: inline-block;
+}
