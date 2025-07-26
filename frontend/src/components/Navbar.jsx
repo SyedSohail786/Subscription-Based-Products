@@ -85,8 +85,8 @@ const Navbar = () => {
               onClick={nav}
             >
               <FaStore className="h-6 w-6 mr-2 text-white" />
-              <span className="text-white text-xl font-bold tracking-tight hidden md:block">
-                {role === "admin" ? "Admin Panel" : role === "user" ? "Digital Product Store" : "Digital Product Store"}
+              <span className="text-white text-xl font-bold tracking-tight md:block">
+                {role === "admin" ? "Admin Panel" : role === "user" ? "Digital Store" : "Digital Store"}
               </span>
             </div>
 
@@ -129,7 +129,7 @@ const Navbar = () => {
 
       {/* Mobile Sidebar - Icons + Text */}
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-indigo-800 text-white transform ${
+        className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-r from-indigo-600 to-purple-600 text-white transform ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out z-50`}
       >
@@ -175,7 +175,7 @@ const Navbar = () => {
       {/* Overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0  bg-opacity-50"
           onClick={() => setMobileOpen(false)}
         />
       )}
