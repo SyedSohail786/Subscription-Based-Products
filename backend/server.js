@@ -30,7 +30,7 @@ app.use("/api/categories", require("./routes/categoryRoutes.js"));
 app.use('/api/plans', require('./routes/planRoutes'));
 app.use('/api/download', require('./routes/download'));
 app.use('/api/comments', require('./routes/commentRoutes'));
-
+app.use('/api/orders', require('./routes/orderRoutes'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

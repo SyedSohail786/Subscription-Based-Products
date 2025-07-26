@@ -21,6 +21,7 @@ import SubcategoryPage from "./pages/user/SubcategoryPage";
 import SearchResults from "./pages/user/SearchResults";
 import CategoryPage from "./pages/user/CategoryPage";
 import BuyProductPayment from "./pages/user/BuyProductPayment";
+import MyOrders from "./pages/user/MyOrders";
 
 export default function App() {
   const { user, role } = useAuthStore();
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/my-bag" element={<MyBag />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/buy-product" element={<BuyProductPayment />} />
+            <Route path="/my-orders" element={<MyOrders />} />
 
           </>
         )}
