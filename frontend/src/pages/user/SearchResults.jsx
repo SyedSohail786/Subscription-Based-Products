@@ -39,7 +39,7 @@ const SearchResults = () => {
 
      return (
           <div className="min-h-screen bg-gray-50">
-               <main className="max-w-7xl mx-auto px-4 py-6">
+               <main className="max-w-7xl mx-auto px-4 py-3">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                          <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
                               Search Results for "{new URLSearchParams(location.search).get('q')}"

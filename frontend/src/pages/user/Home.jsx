@@ -79,7 +79,7 @@ const clearRecentlyViewed = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-3">
         {/* eBooks Section */}
         <section className="mb-8 sm:mb-12">
           <div className="flex justify-between items-center mb-4">
@@ -100,7 +100,7 @@ const clearRecentlyViewed = () => {
                   </div>
                 )) :
                 filterProductsByCategory("Books").map(product => (
-                  <div key={product._id} className="flex-shrink-0 w-40 sm:w-48 px-2">
+                  <div key={product._id} className="flex-shrink-0 w-40 sm:w-48">
                     <ProductCard product={product} />
                   </div>
                 ))
