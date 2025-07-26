@@ -24,28 +24,49 @@ const BuyProductPayment = () => {
   const { user } = useAuthStore();
   const userId = user._id;
 
-  const downloadProductFile = async (productId) => {
+  const downloadFileWithOriginalFormat = async (productId) => {
     try {
-      const res = await axios.get(
+      // First get product details to extract filename and extension
+      const productRes = await axios.get(
         `${BACKEND_URL}/api/products/${productId}`,
         { withCredentials: true }
       );
       
-      const product = res.data;
+      const product = productRes.data;
       const fileUrl = `${BACKEND_URL}/${product.fileUrl.replace(/\\/g, "/")}`;
       
-      // Create a temporary anchor element to trigger download
+      // Extract filename with extension from fileUrl
+      const fileName = fileUrl.split('/').pop();
+      
+      // Fetch the file with proper headers
+      const response = await fetch(fileUrl, {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch file');
+      
+      // Get the blob data
+      const blob = await response.blob();
+      
+      // Create download link
+      const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = fileUrl;
-      link.setAttribute('download', product.title || 'product-file');
+      link.href = downloadUrl;
+      link.setAttribute('download', fileName); // Use original filename
       document.body.appendChild(link);
       link.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(link);
       
-      toast.success("Download started!");
+      toast.success("File downloaded in original format!");
     } catch (error) {
-      console.error("Error downloading file:", error);
-      toast.error("Failed to start download");
+      console.error("Download error:", error);
+      toast.error("Failed to download file");
     }
   };
 
@@ -83,8 +104,8 @@ const BuyProductPayment = () => {
           
           if (verifyRes.data.success) {
             toast.success("Payment Successful! Product added to your library.");
-            // Download the file after successful payment
-            await downloadProductFile(productId);
+            // Download file in original format
+            await downloadFileWithOriginalFormat(productId);
             navigate("/my-bag");
           } else {
             toast.error("Payment Verification Failed");
