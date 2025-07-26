@@ -152,7 +152,6 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    console.log("Incoming query:", req.query);
     
     const { 
       search, 
@@ -182,7 +181,6 @@ exports.getAllProducts = async (req, res) => {
     if (category) {
       const categoryRegex = new RegExp(`^${category}$`, 'i');
       const categoryDoc = await Category.findOne({ name: { $regex: categoryRegex } });
-      console.log(`Category lookup for "${category}":`, categoryDoc);
 
       if (categoryDoc) {
         query.category = categoryDoc._id;
@@ -229,7 +227,6 @@ exports.getAllProducts = async (req, res) => {
 
     // Count total matching documents
     const total = await Product.countDocuments(query);
-    console.log("Final query:", query, "Total matches:", total);
 
     // Get paginated results
     const products = await Product.find(query)
