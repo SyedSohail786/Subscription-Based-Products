@@ -143,11 +143,6 @@ exports.verifyProductPayment = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found." });
     }
 
-    // Add product to user's library - using new ObjectId
-    await User.findByIdAndUpdate(userId, {
-      $addToSet: { ownedProducts: new mongoose.Types.ObjectId(productId) }
-    });
-
     // Save order details
     const order = new Order({
       user: new mongoose.Types.ObjectId(userId),

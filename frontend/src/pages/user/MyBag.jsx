@@ -6,32 +6,23 @@ import moment from "moment";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const MyBag = () => {
-  const [view, setView] = useState("owned"); // "owned" or "history"
   const [ownedProducts, setOwnedProducts] = useState([]);
-  const [downloadHistory, setDownloadHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
-  }, [view]);
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      if (view === "owned") {
-        const res = await axios.get(`${BACKEND_URL}/api/user/owned-products`, {
-          withCredentials: true,
-        });
-        setOwnedProducts(res.data.ownedProducts);
-      } else if (view === "history") {
-        const res = await axios.get(`${BACKEND_URL}/api/download/history`, {
-          withCredentials: true,
-        });
-        setDownloadHistory(res.data);
-      }
+      const res = await axios.get(`${BACKEND_URL}/api/user/owned-products`, {
+        withCredentials: true,
+      });
+      setOwnedProducts(res.data.ownedProducts);
     } catch (err) {
       console.error("Error fetching data", err);
       setError(err.response?.data?.message || "Failed to load data");
@@ -43,35 +34,43 @@ const MyBag = () => {
     }
   };
 
-  const renderProductCard = (product, downloadDate = null) => (
+  const renderProductCard = (product) => (
     <div
-      key={product._id + (downloadDate || "")}
-      onClick={() => navigate(`/product/${product._id}`)}
-      className="cursor-pointer border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:-translate-y-1"
+      key={product._id}
+      className="cursor-pointer border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:-translate-y-1"
     >
-      <div className="relative">
+      <div 
+        className="relative aspect-square" 
+        onClick={() => navigate(`/product/${product._id}`)}
+      >
         <img
-          src={`${BACKEND_URL}/${product.imageUrl}`}
+          src={`${BACKEND_URL}/${product.imageUrl.replace(/\\/g, "/")}`}
           alt={product.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-full object-cover"
           onError={(e) => {
             e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
           }}
         />
-        {downloadDate && (
-          <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
-            {moment(downloadDate).fromNow()}
-          </div>
-        )}
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-gray-800 mb-1 truncate">{product.title}</h3>
-        <p className="text-gray-600 text-sm line-clamp-2 mb-2">{product.description}</p>
-        {downloadDate && (
-          <p className="text-xs text-gray-500 mt-2">
-            Downloaded: {moment(downloadDate).format("MMM D, YYYY")}
-          </p>
-        )}
+        <h3 
+          className="font-semibold text-gray-800 mb-1 truncate hover:text-blue-600"
+          onClick={() => navigate(`/product/${product._id}`)}
+        >
+          {product.title}
+        </h3>
+        <div className="flex justify-between items-center mt-3">
+          <span className="text-gray-900 font-medium">₹{product.price}</span>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/product/${product._id}`);
+            }}
+            className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+          >
+            View
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -94,53 +93,28 @@ const MyBag = () => {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-medium text-gray-700 mb-1">
-        {view === "owned" ? "No products yet" : "No downloads yet"}
-      </h3>
+      <h3 className="text-lg font-medium text-gray-700 mb-1">No products yet</h3>
       <p className="text-gray-500 text-center max-w-md">
-        {view === "owned"
-          ? "Products you purchase will appear here"
-          : "Your download history will appear here"}
+        Products you purchase will appear here
       </p>
-      {view === "owned" && (
-        <button
-          onClick={() => navigate("/")}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          Browse Products
-        </button>
-      )}
+      <button
+        onClick={() => navigate("/")}
+        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+      >
+        Browse Products
+      </button>
     </div>
   );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           My Bag
         </h1>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setView("owned")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              view === "owned"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Owned Products
-          </button>
-          <button
-            onClick={() => setView("history")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              view === "history"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Download History
-          </button>
-        </div>
+        <p className="text-gray-500 mt-1">
+          {ownedProducts.length} {ownedProducts.length === 1 ? 'item' : 'items'}
+        </p>
       </div>
 
       {error ? (
@@ -169,21 +143,11 @@ const MyBag = () => {
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      ) : view === "owned" ? (
-        ownedProducts.length === 0 ? (
-          renderEmptyState()
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {ownedProducts.map(renderProductCard)}
-          </div>
-        )
-      ) : downloadHistory.length === 0 ? (
+      ) : ownedProducts.length === 0 ? (
         renderEmptyState()
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {downloadHistory.map((download) =>
-            renderProductCard(download.product, download.downloadedAt)
-          )}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+          {ownedProducts.map(renderProductCard)}
         </div>
       )}
     </div>
