@@ -37,7 +37,7 @@ const SubcategoryPage = () => {
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{name} Books</h2>
-        <div className="w-64">
+        <div className="w-40">
           <Select
             options={sortOptions}
             defaultValue={sortOptions[0]}
