@@ -20,10 +20,34 @@ const BuyProductPayment = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const amount = params.get("amount");
-  console.log(amount)
   const productId = params.get("productId");
   const { user } = useAuthStore();
   const userId = user._id;
+
+  const downloadProductFile = async (productId) => {
+    try {
+      const res = await axios.get(
+        `${BACKEND_URL}/api/products/${productId}`,
+        { withCredentials: true }
+      );
+      
+      const product = res.data;
+      const fileUrl = `${BACKEND_URL}/${product.fileUrl.replace(/\\/g, "/")}`;
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.setAttribute('download', product.title || 'product-file');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("Download started!");
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast.error("Failed to start download");
+    }
+  };
 
   const handlePayment = async () => {
     const res = await loadRazorpayScript();
@@ -50,17 +74,24 @@ const BuyProductPayment = () => {
           productId,
         };
 
-        const verifyRes = await axios.post(
-          `${BACKEND_URL}/api/payments/verify-product`, 
-          payload, 
-          { withCredentials: true }
-        );
-        
-        if (verifyRes.data.success) {
-          toast.success("Payment Successful! Product added to your library.");
-          navigate("/profile");
-        } else {
-          toast.error("Payment Verification Failed");
+        try {
+          const verifyRes = await axios.post(
+            `${BACKEND_URL}/api/payments/verify-product`, 
+            payload, 
+            { withCredentials: true }
+          );
+          
+          if (verifyRes.data.success) {
+            toast.success("Payment Successful! Product added to your library.");
+            // Download the file after successful payment
+            await downloadProductFile(productId);
+            navigate("/my-bag");
+          } else {
+            toast.error("Payment Verification Failed");
+          }
+        } catch (error) {
+          console.error("Payment verification error:", error);
+          toast.error("Error processing your payment");
         }
       },
       prefill: {
