@@ -11,7 +11,8 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [owned, setOwned] = useState(false);
+  const [inBag, setInBag] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [rating, setRating] = useState(0);
@@ -19,7 +20,7 @@ const ProductDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
 
-  // Load product and ownership
+  // Load product and check purchase status
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +33,9 @@ const ProductDetail = () => {
         setAverageRating(productRes.data.averageRating || 0);
         setTotalReviews(productRes.data.reviewCount || 0);
         setComments(commentsRes.data.comments || []);
-        await checkOwnership();
+        
+        await checkBagStatus();
+        await checkPurchaseStatus();
       } catch (err) {
         console.error("Error loading product:", err);
         navigate("/");
@@ -44,22 +47,38 @@ const ProductDetail = () => {
     fetchData();
   }, [id]);
 
-  // Check if user owns product
-  const checkOwnership = async () => {
+  // Check if product is in user's bag
+  const checkBagStatus = async () => {
     try {
       const res = await axios.get(`${BACKEND_URL}/api/user/owned-products`, {
         withCredentials: true,
       });
-      const ownedProductIds = res.data.ownedProducts.map((p) => p._id);
-      setOwned(ownedProductIds.includes(id));
+      const bagProductIds = res.data.ownedProducts.map((p) => p._id);
+      setInBag(bagProductIds.includes(id));
     } catch (err) {
       if (err.response?.status === 401) {
-        setOwned(false);
+        setInBag(false);
       } else {
-        console.error("Failed to check ownership", err);
+        console.error("Failed to check bag status", err);
       }
     }
   };
+
+  // Check if user has purchased the product
+const checkPurchaseStatus = async () => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/api/orders/check-purchase/${id}`, {
+      withCredentials: true,
+    });
+    setHasPurchased(res.data.hasPurchased);
+  } catch (err) {
+    if (err.response?.status === 401) {
+      setHasPurchased(false);
+    } else {
+      console.error("Failed to check purchase status", err);
+    }
+  }
+};
 
   // Handle product purchase
   const handleBuyNow = async () => {
@@ -83,16 +102,12 @@ const ProductDetail = () => {
   // Add or remove from bag
   const handleToggleLibrary = async () => {
     try {
-      const action = owned ? 'remove-from-library' : 'add-to-library';
+      const action = inBag ? 'remove-from-library' : 'add-to-library';
       const url = `${BACKEND_URL}/api/user/${action}/${id}`;
 
       await axios.post(url, {}, { withCredentials: true });
-      setOwned(!owned);
-      toast.success(owned ? "Removed from Bag" : "Added to Bag");
-      
-      if (!owned) {
-        await checkOwnership();
-      }
+      setInBag(!inBag);
+      toast.success(inBag ? "Removed from Bag" : "Added to Bag");
     } catch (err) {
       if (err.response?.status === 401) {
         navigate("/login");
@@ -122,23 +137,21 @@ const ProductDetail = () => {
         { withCredentials: true }
       );
       
-      // Update comments list and reset form
       setComments((prev) => [res.data, ...prev]);
       setCommentText("");
       setRating(0);
       toast.success("Review submitted");
 
-      // Update average rating
       const newAverage = (
         (parseFloat(averageRating) * totalReviews + rating
       ) / (totalReviews + 1));
       setAverageRating(newAverage.toFixed(1));
       setTotalReviews(totalReviews + 1);
     } catch (err) {
-      if (err.response?.status === 401) {
+      if (err.response && err.response.status === 401) {
         navigate("/login");
       } else if (err.response?.status === 403) {
-        toast.error("Only certified buyers can review this product");
+        toast.error("Only customers who purchased this product can review it");
       } else {
         toast.error("Failed to add review");
       }
@@ -248,12 +261,12 @@ const ProductDetail = () => {
               <button
                 onClick={handleToggleLibrary}
                 className={`flex-1 font-medium py-3 px-6 rounded-md transition transform hover:scale-105 ${
-                  owned 
+                  inBag 
                     ? "bg-red-100 hover:bg-red-200 text-red-800 border border-red-200"
                     : "bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200"
                 }`}
               >
-                {owned ? (
+                {inBag ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -298,11 +311,15 @@ const ProductDetail = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Customer Reviews</h3>
-              <p className="text-sm text-gray-600">Share your experience with this product</p>
+              {!hasPurchased && (
+                <p className="text-sm text-gray-600">
+                  Only customers who purchased this product can leave reviews
+                </p>
+              )}
             </div>
           </div>
           
-          {owned && (
+          {hasPurchased ? (
             <form onSubmit={handleCommentSubmit} className="mb-6 bg-gray-50 p-4 rounded-lg">
               <h4 className="font-medium text-gray-800 mb-2">Write a review</h4>
               <div className="flex items-center mb-3">
@@ -345,6 +362,12 @@ const ProductDetail = () => {
                 Submit Review
               </button>
             </form>
+          ) : (
+            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+              <p className="text-blue-800">
+                You must purchase this product to leave a review
+              </p>
+            </div>
           )}
 
           {comments.length === 0 ? (

@@ -106,7 +106,7 @@ const BuyProductPayment = () => {
             toast.success("Payment Successful! Product added to your library.");
             // Download file in original format
             await downloadFileWithOriginalFormat(productId);
-            navigate("/my-bag");
+            navigate("/my-orders");
           } else {
             toast.error("Payment Verification Failed");
           }

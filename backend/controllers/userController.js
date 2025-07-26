@@ -209,3 +209,16 @@ exports.sendOtp = async (req, res) => {
 
   res.status(200).json({ message: "OTP sent to your email" });
 };
+
+exports.getUserPurchasedProducts = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate('purchasedProducts', '_id title price');
+      
+    res.status(200).json({
+      purchasedProducts: user.purchasedProducts || []
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

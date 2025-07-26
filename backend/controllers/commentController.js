@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Comment = require("../models/Comment");
+const Order = require("../models/Order");
 
 exports.createComment = async (req, res) => {
   try {
@@ -14,12 +15,15 @@ exports.createComment = async (req, res) => {
       return res.status(400).json({ message: "Please provide a valid rating (1-5)" });
     }
 
-    // Check if user owns the product
-    const user = await User.findById(req.user._id);
-    const ownsProduct = user.ownedProducts.some(p => p._id.toString() === productId);
+    // Check if user has purchased the product by looking at orders
+    const order = await Order.findOne({
+      user: req.user._id,
+      product: productId,
+      status: "completed"
+    });
 
-    if (!ownsProduct) {
-      return res.status(403).json({ message: "Only certified buyers can review this product" });
+    if (!order) {
+      return res.status(403).json({ message: "Only customers who purchased this product can review it" });
     }
 
     const comment = await Comment.create({

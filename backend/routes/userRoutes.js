@@ -9,7 +9,8 @@ const {
   addToLibrary,
   getOwnedProducts,
   removeFromLibrary,
-  sendOtp
+  sendOtp,
+  getUserPurchasedProducts
 } = require("../controllers/userController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -26,5 +27,6 @@ router.get("/owned-products", protect, getOwnedProducts);
 router.post("/add-to-library/:productId", protect, addToLibrary);
 router.post("/remove-from-library/:productId", protect, removeFromLibrary);
 router.post("/send-otp", sendOtp);
+router.get('/purchased-products', protect, getUserPurchasedProducts);
 
 module.exports = router;

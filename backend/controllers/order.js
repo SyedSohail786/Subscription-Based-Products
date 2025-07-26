@@ -22,3 +22,23 @@ exports.getMyOrders = async (req, res) => {
        res.status(500).json({ message: 'Server Error' });
      }
    }
+
+
+   exports.checkProductPurchase = async (req, res) => {
+     try {
+       const { productId } = req.params;
+       const userId = req.user._id;
+   
+       // Check if there's a completed order for this user and product
+       const order = await Order.findOne({
+         user: userId,
+         product: productId,
+         status: "completed"
+       });
+   
+       res.json({ hasPurchased: !!order });
+     } catch (error) {
+       console.error("Error checking purchase:", error);
+       res.status(500).json({ error: "Internal server error" });
+     }
+   };
