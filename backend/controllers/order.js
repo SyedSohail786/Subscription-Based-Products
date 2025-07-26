@@ -5,14 +5,13 @@ exports.getMyOrders = async (req, res) => {
        const orders = await Order.find({ user: req.userId })
          .sort({ createdAt: -1 })
          .populate('product', 'title imageUrl fileUrl');
-       
        // Format the response to include product details
        const formattedOrders = orders.map(order => ({
          ...order._doc,
          productDetails: {
-           title: order.product.title,
-           imageUrl: order.product.imageUrl,
-           fileUrl: order.product.fileUrl
+           title: order.productDetails.title,
+           imageUrl: order.productDetails.imageUrl,
+           fileUrl: order.productDetails.fileUrl
          }
        }));
    

@@ -6,6 +6,7 @@ import { FaRegUser, FaStore } from "react-icons/fa6";
 import { IoIosLogOut } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { RiAdminLine } from "react-icons/ri";
+import { BiLibrary } from "react-icons/bi";
 
 const Navbar = () => {
   const { user, role, logout, setUserFromSession } = useAuthStore();
@@ -53,8 +54,9 @@ const Navbar = () => {
   // User navigation items
   const userNavItems = [
     { path: "/", name: "Home", icon: <Home className="h-5 w-5" /> },
+    { path: "/profile", name: "Profile", icon: <User className="h-5 w-5" /> },
     { path: "/my-bag", name: "My Bag", icon: <ShoppingBag className="h-5 w-5" /> },
-    { path: "/profile", name: "Profile", icon: <User className="h-5 w-5" /> }
+    { path: "/my-orders", name: "My Orders", icon: <BiLibrary className="h-5 w-5" /> }
   ];
 
   // Guest navigation items
