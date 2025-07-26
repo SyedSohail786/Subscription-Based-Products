@@ -48,29 +48,21 @@ const ProductDetail = () => {
     }
   };
 
-  // Handle product download
-  const handleDownload = async () => {
+  // Handle product purchase
+  const handleBuyNow = async () => {
     try {
-      const res = await axios.get(
-        `${BACKEND_URL}/api/user/check-access/${id}`,
+      const res = await axios.post(
+        `${BACKEND_URL}/api/payments/create-product-order`,
+        { productId: id },
         { withCredentials: true }
       );
-
-      if (res.data.canDownload) {
-        const fileUrl = `${BACKEND_URL}/${product.fileUrl.replace(/\\/g, "/")}`;
-        toast.success("Downloading...");
-        window.open(fileUrl, "_blank");
-      } else if (res.data.canDownload === false) {
-        toast.error(res.data.message);
-        navigate("/profile");
-      } else {
-        navigate("/login");
-      }
+      navigate(`/buy-product?amount=${res.data.amount / 100}&productId=${id}&orderId=${res.data.id}`);
     } catch (err) {
       if (err.response?.status === 401) {
         navigate("/login");
       } else {
-        console.error("Error downloading", err);
+        toast.error("Failed to initiate payment");
+        console.error("Payment initiation error:", err);
       }
     }
   };
@@ -128,85 +120,145 @@ const ProductDetail = () => {
     }
   };
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+    </div>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <img
-          src={`${BACKEND_URL}/${product.imageUrl}`}
-          alt={product.title}
-          className="w-full h-auto rounded"
-        />
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className="md:flex">
+          {/* Product Image - Made smaller and more professional */}
+          <div className="md:w-1/3 p-6 flex items-center justify-center bg-gray-50">
+            <img
+              className="max-h-80 w-auto object-contain rounded-lg"
+              src={`${BACKEND_URL}/${product.imageUrl}`}
+              alt={product.title}
+            />
+          </div>
 
-        <div>
-          <h2 className="text-2xl font-bold mb-2">{product.title}</h2>
-          <p className="text-gray-600 mb-2">{product.author}</p>
-          <p className="text-gray-600 mb-2">{product.shortDescription}</p>
-          <p className="text-gray-600 mb-2">{product.about}</p>
-          <p className="text-gray-600 mb-2">{product.tags.join(", ")}</p>
-          <p className="text-gray-800 font-semibold mb-2">₹{product.price}</p>
-          <p className="text-gray-500 mb-4">
-            Released: {moment(product.releaseDate).format("DD/MM/YYYY")}
-          </p>
+          {/* Product Details */}
+          <div className="md:w-2/3 p-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-800">{product.title}</h1>
+                <p className="text-gray-600 mt-1">by {product.author}</p>
+              </div>
+              <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">
+                {product.category.name}
+              </span>
+            </div>
 
-          <div className="flex gap-4">
-            <button
-              onClick={handleDownload}
-              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-            >
-              Download
-            </button>
+            <div className="mt-4">
+              <span className="text-3xl font-bold text-gray-900">₹{product.price}</span>
+            </div>
 
-            <button
-              onClick={handleToggleLibrary}
-              className={`px-4 py-2 rounded text-white ${
-                owned
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-green-600 hover:bg-green-700"
-              }`}
-            >
-              {owned ? "Remove from Bag" : "Add to Bag"}
-            </button>
+            <div className="mt-6 space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">Description</h3>
+                <p className="mt-1 text-sm text-gray-600">{product.shortDescription}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">Details</h3>
+                <p className="mt-1 text-sm text-gray-600">{product.about}</p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-sm font-medium text-gray-900">Tags</h3>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {product.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 flex gap-3">
+              {owned ? (
+                <button
+                  onClick={() => navigate('/my-bag')}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition"
+                >
+                  View in Library
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition"
+                  >
+                    Buy Now
+                  </button>
+                  <button
+                    onClick={handleToggleLibrary}
+                    className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition"
+                  >
+                    {owned ? "Remove from Bag" : "Add to Bag"}
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="mt-4 text-xs text-gray-500">
+              <p>Released: {moment(product.releaseDate).format("MMMM Do, YYYY")}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Comments Section */}
-      <div className="mt-10">
-        <h3 className="text-lg font-semibold mb-2">Comments</h3>
+        {/* Comments Section */}
+        <div className="border-t border-gray-200 px-6 py-4">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Customer Reviews</h3>
+          
+          <form onSubmit={handleCommentSubmit} className="mb-6">
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Share your thoughts about this product..."
+              className="w-full border border-gray-300 rounded-md p-3 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+              rows="3"
+            />
+            <button
+              type="submit"
+              className="mt-2 bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+            >
+              Post Review
+            </button>
+          </form>
 
-        <form onSubmit={handleCommentSubmit} className="mb-4">
-          <textarea
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Write a comment..."
-            className="w-full border rounded p-2 mb-2"
-            rows="3"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Post Comment
-          </button>
-        </form>
-
-        {comments.length === 0 ? (
-          <p className="text-gray-500">No comments yet.</p>
-        ) : (
-          <ul>
-            {comments.map((c) => (
-              <li key={c._id} className="mb-4 border-b pb-2">
-                <p className="font-semibold">{c.user.name}</p>
-                <p className="text-gray-700">{c.text}</p>
-                <p className="text-sm text-gray-400">
-                  {moment(c.createdAt).fromNow()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
+          {comments.length === 0 ? (
+            <p className="text-sm text-gray-500">No reviews yet. Be the first to review!</p>
+          ) : (
+            <div className="space-y-4">
+              {comments.map((c) => (
+                <div key={c._id} className="border-b border-gray-100 pb-4 last:border-0">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-medium text-sm">
+                        {c.user.name.charAt(0)}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{c.user.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {moment(c.createdAt).fromNow()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-700">
+                    <p>{c.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
