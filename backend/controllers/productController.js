@@ -1,13 +1,29 @@
-
+const Comment = require("../models/Comment");
+const mongoose = require("mongoose");
 const Category = require("../models/Category");
 const Product = require("../models/Product");
 const User = require("../models/User");
 
 // ✅ Get single product
 exports.getProductById = async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).json({ message: "Product not found" });
-  res.json(product);
+  try {
+    const product = await Product.findById(req.params.id).populate('category');
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    // Get average rating and review count
+    const comments = await Comment.find({ product: req.params.id });
+    const averageRating = comments.reduce((acc, curr) => acc + (curr.rating || 0), 0) / (comments.length || 1);
+    const reviewCount = comments.length;
+
+    res.json({
+      ...product.toObject(),
+      averageRating: averageRating.toFixed(1),
+      reviewCount
+    });
+  } catch (error) {
+    console.error("Error getting product:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // ✅ Create product (Admin)
@@ -65,9 +81,6 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: "Error creating product" });
   }
 };
-
-
-
 
 
 // ✅ Update product
@@ -150,7 +163,8 @@ exports.getAllProducts = async (req, res) => {
       type, 
       sortBy = 'latest', 
       page = 1, 
-      limit = 10 
+      limit = 10,
+      ratingMin
     } = req.query;
 
     const query = {};
@@ -166,7 +180,7 @@ exports.getAllProducts = async (req, res) => {
 
     // Category filter - case insensitive
     if (category) {
-      const categoryRegex = new RegExp(`^${category}$`, 'i'); // Case insensitive exact match
+      const categoryRegex = new RegExp(`^${category}$`, 'i');
       const categoryDoc = await Category.findOne({ name: { $regex: categoryRegex } });
       console.log(`Category lookup for "${category}":`, categoryDoc);
 
@@ -186,7 +200,7 @@ exports.getAllProducts = async (req, res) => {
 
     // Type filter (matches against tags array)
     if (type) {
-      query.tags = { $regex: new RegExp(`^${type}$`, 'i') }; // Case insensitive match
+      query.tags = { $regex: new RegExp(`^${type}$`, 'i') };
     }
 
     // Price filter
@@ -208,6 +222,9 @@ exports.getAllProducts = async (req, res) => {
       case 'price-high':
         sortOption = { price: -1 };
         break;
+      case 'rating':
+        sortOption = { averageRating: -1 };
+        break;
     }
 
     // Count total matching documents
@@ -221,13 +238,42 @@ exports.getAllProducts = async (req, res) => {
       .limit(parseInt(limit))
       .populate("category", "name");
 
-    const totalPages = Math.ceil(total / limit);
+    // Get ratings for each product
+    const productsWithRatings = await Promise.all(
+      products.map(async (product) => {
+        const comments = await Comment.find({ product: product._id });
+        const totalRating = comments.reduce((sum, comment) => sum + comment.rating, 0);
+        const averageRating = comments.length > 0 
+          ? (totalRating / comments.length).toFixed(1) 
+          : "0.0";
+        const reviewCount = comments.length;
+
+        return {
+          ...product.toObject(),
+          averageRating,
+          reviewCount
+        };
+      })
+    );
+
+    // Apply rating filter if specified
+    const filteredProducts = ratingMin
+      ? productsWithRatings.filter(p => parseFloat(p.averageRating) >= parseFloat(ratingMin))
+      : productsWithRatings;
+
+    const totalPages = Math.ceil(filteredProducts.length / limit);
+
+    // Apply pagination to filtered results
+    const paginatedProducts = filteredProducts.slice(
+      (page - 1) * limit,
+      page * limit
+    );
 
     res.status(200).json({ 
-      products, 
+      products: paginatedProducts, 
       totalPages,
       currentPage: parseInt(page),
-      totalProducts: total
+      totalProducts: filteredProducts.length
     });
   } catch (err) {
     console.error("Error in getAllProducts:", err);
