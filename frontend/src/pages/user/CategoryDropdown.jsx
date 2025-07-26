@@ -35,7 +35,7 @@ const CategoryDropdown = ({ categories }) => {
                     key={subcat}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => {
-                      navigate(`/subcategory/${subcat.toLowerCase().replace(' ', '-')}`);
+                      navigate(`/subcategory/${category.name.toLowerCase()}/${subcat.toLowerCase().replace(' ', '-')}`);
                       setHoveredCategory(null);
                     }}
                   >

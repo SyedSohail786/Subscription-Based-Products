@@ -35,8 +35,7 @@ export default function App() {
         <Route path="/admin/login" element={role === "admin" ? <Navigate to="/admin/dashboard" /> : <AdminLogin />} />
         <Route path="/forgot-password" element={<ChangePassword />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/subcategory/:name" element={<SubcategoryPage />} />
-        <Route path="/subcategory/:subcategory" element={<SubcategoryPage />} />
+        <Route path="/subcategory/:name/:subcategory" element={<SubcategoryPage />} />
         <Route path="/category/:category" element={<CategoryPage />} />
         <Route path="/search" element={<SearchResults />} />
 

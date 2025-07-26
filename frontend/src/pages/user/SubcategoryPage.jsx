@@ -13,16 +13,16 @@ const sortOptions = [
 ];
 
 const SubcategoryPage = () => {
-  const { name } = useParams();
+  const { name, subcategory} = useParams();
   const [products, setProducts] = useState([]);
   const [sortBy, setSortBy] = useState('latest');
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/api/products`, { params: { subcategory: name, sortBy } })
+    axios.get(`${BACKEND_URL}/api/products`, { params: {category: name, subcategory: subcategory, sortBy } })
       .then(res => setProducts(res.data.products || []))
       .catch(console.error);
-  }, [name, sortBy]);
+  }, [name, subcategory, sortBy]);
 
   const sortProducts = (list) => {
     switch (sortBy) {
@@ -36,7 +36,7 @@ const SubcategoryPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">{name} Books</h2>
+        <h2 className="text-2xl font-bold"> {name}-{subcategory} </h2>
         <div className="w-40">
           <Select
             options={sortOptions}
