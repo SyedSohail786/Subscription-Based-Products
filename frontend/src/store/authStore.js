@@ -1,14 +1,12 @@
 import { create } from "zustand";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const useAuthStore = create((set,get) => ({
   user: null,
   role: null, // 'user' or 'admin'
   token: null,
-
   setUser: (user, role, token) => set({ user, role, token }),
   login: async (credentials, type) => {
     try {
@@ -49,8 +47,16 @@ const useAuthStore = create((set,get) => ({
       } else {
         set({ user: res.data, role: "user" });
       }
-    } catch {
-      set({ user: null, role: null });
+    } catch(err) {
+      if(err.status === 401){
+        set({ user: null, role: null });
+        const location = window.location.href
+        if(location === "http://localhost:5173/login"){
+          return;
+        }else {
+          window.location.href = "/login";
+        }
+      }
     }
   }
 }));
