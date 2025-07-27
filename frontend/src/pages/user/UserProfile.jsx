@@ -121,33 +121,32 @@ const UserProfile = () => {
                 <p>You have not purchased any plan yet</p>
               </div>
               :
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">Subscription Details</h2>
-              {subscription && subscription.plan ? (
-                <div className="space-y-2">
-                  <p><span className="font-medium text-gray-700">Plan:</span> {subscription.plan.name}</p>
-                  {subscription.plan.price !== 0 ? (
-                    <p><span className="font-medium text-gray-700">Downloads:</span> Unlimited</p>
-                  ) : (
-                    <p>
-                      <span className="font-medium text-gray-700">Free Downloads:</span>{" "}
-                      <span className={freeDownloadsUsed >= 5 ? "text-red-500" : "text-green-600"}>
-                        {freeDownloadsUsed} / 5
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">Subscription Details</h2>
+                {subscription && subscription.plan ? (
+                  <div className="space-y-2">
+                    <p><span className="font-medium text-gray-700">Plan:</span> {subscription.plan.name}</p>
+                    {subscription.plan.price !== 0 ? (
+                      <p><span className="font-medium text-gray-700">Downloads:</span> Unlimited</p>
+                    ) : (
+                      <p>
+                        <span className="font-medium text-gray-700">Free Downloads:</span>{" "}
+                        <span className={freeDownloadsUsed >= 5 ? "text-red-500" : "text-green-600"}>
+                          {freeDownloadsUsed} / 5
+                        </span>
+                      </p>
+                    )}
+                    <p><span className="font-medium text-gray-700">Status:</span>{" "}
+                      <span className={subscription.active ? "text-green-600" : "text-red-500"}>
+                        {subscription.active ? "Active" : "Inactive"}
                       </span>
                     </p>
-                  )}
-                  <p><span className="font-medium text-gray-700">Status:</span>{" "}
-                    <span className={subscription.active ? "text-green-600" : "text-red-500"}>
-                      {subscription.active ? "Active" : "Inactive"}
-                    </span>
-                  </p>
-                  <p><span className="font-medium text-gray-700">Expiry Date:</span> {moment(subscription.endDate).format("MMMM D, YYYY")}</p>
-                </div>
-              ) : (
-                <p className="text-gray-600">No active subscription</p>
-              )}
-            </div>
-              
+                    <p><span className="font-medium text-gray-700">Expiry Date:</span> {moment(subscription.endDate).format("MMMM D, YYYY")}</p>
+                  </div>
+                ) : (
+                  <p className="text-gray-600">No active subscription</p>
+                )}
+              </div>
             }
           </div>
 
@@ -158,21 +157,33 @@ const UserProfile = () => {
             }}
             className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center justify-center"
           >
-            {
-              user.subscription.paymentId === null ?
-              "Buy Plan"
-              :
-              "Change Plan"
-            }
-            
+            {user.subscription.paymentId === null ? "Buy Plan" : "Change Plan"}
           </button>
         </div>
       </div>
 
-      {/* Improved Subscription Plans Modal */}
+      {/* Enhanced Subscription Plans Modal with Animations */}
       {showModal && (
-        <div className="fixed inset-0 bg-indigo-200 bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-2 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop with fade-in animation */}
+          <div 
+            className="fixed inset-0 bg-indigo-200 bg-opacity-50 transition-opacity duration-300"
+            style={{
+              opacity: showModal ? 1 : 0,
+              backdropFilter: 'blur(4px)'
+            }}
+            onClick={() => {
+              setShowModal(false);
+              setSelectedPlan(null);
+            }}
+          />
+          
+          {/* Modal container with slide-up animation */}
+          <div
+            className={`relative bg-white rounded-xl shadow-xl w-full max-w-md mx-2 max-h-[90vh] overflow-y-auto transform transition-all duration-300 ${
+              showModal ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}
+          >
             <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-200 flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-800">Choose a Plan</h2>
               <button
@@ -180,7 +191,7 @@ const UserProfile = () => {
                   setShowModal(false);
                   setSelectedPlan(null);
                 }}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -200,7 +211,7 @@ const UserProfile = () => {
                   {plans.map((plan) => (
                     <div 
                       key={plan._id} 
-                      className={`border rounded-lg p-4 transition-all ${
+                      className={`border rounded-lg p-4 transition-all duration-200 ${
                         selectedPlan?._id === plan._id 
                           ? "border-indigo-500 bg-indigo-50 shadow-md" 
                           : "border-gray-200 hover:border-gray-300"

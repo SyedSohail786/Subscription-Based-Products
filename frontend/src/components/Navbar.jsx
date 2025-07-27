@@ -54,9 +54,9 @@ const Navbar = () => {
   // User navigation items
   const userNavItems = [
     { path: "/", name: "Home", icon: <Home className="h-5 w-5" /> },
-    { path: "/profile", name: "Profile", icon: <User className="h-5 w-5" /> },
     { path: "/my-bag", name: "My Bag", icon: <ShoppingBag className="h-5 w-5" /> },
-    { path: "/my-orders", name: "My Orders", icon: <BiLibrary className="h-5 w-5" /> }
+    { path: "/my-orders", name: "My Orders", icon: <BiLibrary className="h-5 w-5" /> },
+    { path: "/profile", name: "Profile", icon: <User className="h-5 w-5" /> },
   ];
 
   // Guest navigation items

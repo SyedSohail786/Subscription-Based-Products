@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -87,6 +87,8 @@ const ForgotPassword = () => {
                 />
               </div>
 
+              <h1 className="text-sm text-gray-600">Remember your password? <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium hover:underline">Login</Link></h1>
+              
               <button
                 type="submit"
                 disabled={isSendingOtp}
@@ -106,6 +108,7 @@ const ForgotPassword = () => {
                   "Send OTP"
                 )}
               </button>
+              
             </form>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-6">
