@@ -74,16 +74,26 @@ const Home = () => {
     }
   };
 
-  const Carousel = ({ title, products, refKey, viewAllLink }) => (
+  const Carousel = ({ title, products, refKey, viewAllLink, showClearHistory, onClearHistory }) => (
     <section className="mb-8 sm:mb-12 relative">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg sm:text-xl font-semibold">{title}</h3>
-        <Link
-          to={viewAllLink}
-          className="text-blue-600 hover:underline flex items-center text-sm sm:text-base"
-        >
-          View All <FiArrowRight className="ml-1" />
-        </Link>
+        <div className="flex items-center gap-4">
+          {showClearHistory && (
+            <button
+              onClick={onClearHistory}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Clear History
+            </button>
+          )}
+          <Link
+            to={viewAllLink}
+            className="text-blue-600 hover:underline flex items-center text-sm sm:text-base"
+          >
+            View All <FiArrowRight className="ml-1" />
+          </Link>
+        </div>
       </div>
       <div className="relative group">
         <button
@@ -157,20 +167,14 @@ const Home = () => {
         />
 
         {recentlyViewed.length > 0 ? (
-          <div className="relative">
-            <Carousel
-              title="Recently Viewed"
-              products={recentlyViewed}
-              refKey="recent"
-              viewAllLink="#"
-            />
-            <button
-              onClick={clearRecentlyViewed}
-              className="absolute top-0 right-32 text-sm text-gray-500 hover:text-gray-700 underline"
-            >
-              Clear History
-            </button>
-          </div>
+          <Carousel
+            title="Recently Viewed"
+            products={recentlyViewed}
+            refKey="recent"
+            viewAllLink="#"
+            showClearHistory={true}
+            onClearHistory={clearRecentlyViewed}
+          />
         ) : (
           <div className="mb-8 sm:mb-12 text-center py-8">
             <p className="text-gray-500">Your recently viewed items will appear here</p>

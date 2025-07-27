@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import moment from "moment";
+import { FiShoppingBag, FiEye, FiArrowLeft } from "react-icons/fi";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -37,37 +37,41 @@ const MyBag = () => {
   const renderProductCard = (product) => (
     <div
       key={product._id}
-      className="cursor-pointer border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:-translate-y-1"
+      className="group bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-200 overflow-hidden transition-all duration-300 cursor-pointer"
+      onClick={() => navigate(`/product/${product._id}`)}
     >
-      <div 
-        className="relative aspect-square" 
-        onClick={() => navigate(`/product/${product._id}`)}
-      >
+      <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
         <img
           src={`${BACKEND_URL}/${product.imageUrl.replace(/\\/g, "/")}`}
           alt={product.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
-            e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
+            e.target.src = "https://via.placeholder.com/300x400/f3f4f6/9ca3af?text=No+Image";
           }}
+          loading="lazy"
         />
+        <div className="absolute bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="bg-white rounded-full p-3 shadow-lg">
+              <FiEye className="w-5 h-5 text-gray-700" />
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="p-4">
-        <h3 
-          className="font-semibold text-gray-800 mb-1 truncate hover:text-blue-600"
-          onClick={() => navigate(`/product/${product._id}`)}
-        >
+      <div className="p-3 sm:p-4">
+        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base group-hover:text-blue-600 transition-colors">
           {product.title}
         </h3>
-        <div className="flex justify-between items-center mt-3">
-          <span className="text-gray-900 font-medium">₹{product.price}</span>
-          <button 
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3">
+          <span className="text-base sm:text-lg font-bold text-gray-900">₹{product.price}</span>
+          <button
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/product/${product._id}`);
             }}
-            className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+            className="flex items-center justify-center gap-1 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors w-full sm:w-auto"
           >
+            <FiEye className="w-3 h-3 sm:w-4 sm:h-4" />
             View
           </button>
         </div>
@@ -76,80 +80,82 @@ const MyBag = () => {
   );
 
   const renderEmptyState = () => (
-    <div className="flex flex-col items-center justify-center py-12">
-      <div className="bg-gray-100 p-6 rounded-full mb-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-10 w-10 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M20 7h-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"
-          />
-        </svg>
+    <div className="flex flex-col items-center justify-center py-16 px-4">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 rounded-full mb-6">
+        <FiShoppingBag className="h-12 w-12 text-blue-600" />
       </div>
-      <h3 className="text-lg font-medium text-gray-700 mb-1">No products yet</h3>
-      <p className="text-gray-500 text-center max-w-md">
-        Products you purchase will appear here
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">Your bag is empty</h3>
+      <p className="text-gray-500 text-center max-w-md mb-6">
+        Products you purchase will appear here. Start exploring our collection to find something you love!
       </p>
       <button
         onClick={() => navigate("/")}
-        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
       >
+        <FiArrowLeft className="w-4 h-4" />
         Browse Products
       </button>
     </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-          My Bag
-        </h1>
-        <p className="text-gray-500 mt-1">
-          {ownedProducts.length} {ownedProducts.length === 1 ? 'item' : 'items'}
-        </p>
-      </div>
-
-      {error ? (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-red-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <button
+              onClick={() => navigate("/")}
+              className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              <FiArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                My Bag
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {loading ? "Loading..." : `${ownedProducts.length} ${ownedProducts.length === 1 ? 'item' : 'items'}`}
+              </p>
             </div>
           </div>
         </div>
-      ) : loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : ownedProducts.length === 0 ? (
-        renderEmptyState()
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-          {ownedProducts.map(renderProductCard)}
-        </div>
-      )}
+
+        {/* Content */}
+        {error ? (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <svg className="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error loading your bag</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <button
+                  onClick={fetchData}
+                  className="mt-3 text-sm text-red-600 hover:text-red-500 underline"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent"></div>
+          </div>
+        ) : ownedProducts.length === 0 ? (
+          renderEmptyState()
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            {ownedProducts.map(renderProductCard)}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

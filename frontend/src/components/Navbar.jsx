@@ -148,7 +148,7 @@ const Navbar = () => {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-80 backdrop-blur-md bg-white/95 border-r border-gray-200/50 transform ${
+        className={`fixed inset-y-0 left-0 w-64 backdrop-blur-md bg-white/95 border-r border-gray-200/50 transform ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out z-50 shadow-2xl`}
       >
