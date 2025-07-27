@@ -169,26 +169,26 @@ const UserProfile = () => {
         </div>
       </div>
 
-      {/* Subscription Plans Modal */}
+      {/* Improved Subscription Plans Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-[#00000080] bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Choose a Plan</h2>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setSelectedPlan(null);
-                  }}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-indigo-200 bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-2 max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800">Choose a Plan</h2>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedPlan(null);
+                }}
+                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
+            <div className="p-4">
               {fetchingPlans ? (
                 <div className="flex justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
@@ -200,98 +200,106 @@ const UserProfile = () => {
                   {plans.map((plan) => (
                     <div 
                       key={plan._id} 
-                      className={`border rounded-xl p-5 ${selectedPlan?._id === plan._id ? "border-indigo-500 bg-indigo-50" : "border-gray-200"}`}
+                      className={`border rounded-lg p-4 transition-all ${
+                        selectedPlan?._id === plan._id 
+                          ? "border-indigo-500 bg-indigo-50 shadow-md" 
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
                     >
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{plan.name}</h3>
-                          <p className="text-gray-600 text-sm mt-1">{plan.description}</p>
-                          <div className="mt-2 flex items-center">
-                            <span className="text-2xl font-bold text-gray-800">₹{plan.price}</span>
-                            <span className="text-gray-500 ml-2">/ {plan.durationInDays} days</span>
+                      <div className="flex flex-col gap-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-lg text-gray-800">{plan.name}</h3>
+                            <p className="text-gray-600 text-sm mt-1">{plan.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xl font-bold text-gray-800">₹{plan.price}</div>
+                            <div className="text-xs text-gray-500">{plan.durationInDays} days</div>
                           </div>
                         </div>
 
-                        {currentPlanId === plan._id ? (
-                          <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                            Current Plan
-                          </span>
-                        ) : plan.name === "Trial" ? (
-                          <span className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
-                            Not Available
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedPlan(plan);
-                              setCoupon("");
-                              setCouponStatus(null);
-                            }}
-                            className={`px-4 py-2 rounded-full font-medium ${
-                              selectedPlan?._id === plan._id
-                                ? "bg-indigo-600 text-white"
-                                : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                            }`}
-                          >
-                            {selectedPlan?._id === plan._id ? "Selected" : "Select"}
-                          </button>
-                        )}
-                      </div>
-
-                      {selectedPlan?._id === plan._id && (
-                        <div className="mt-6 space-y-4">
-                          <div className="flex flex-col md:flex-row gap-2">
-                            <input
-                              type="text"
-                              placeholder="Enter coupon code"
-                              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                              value={coupon}
-                              onChange={(e) => setCoupon(e.target.value)}
-                            />
+                        <div className="flex justify-between items-center">
+                          {currentPlanId === plan._id ? (
+                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                              Current Plan
+                            </span>
+                          ) : plan.name === "Trial" ? (
+                            <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                              Not Available
+                            </span>
+                          ) : (
                             <button
-                              onClick={handleApplyCoupon}
-                              disabled={checkingCoupon || !coupon}
-                              className={`px-4 py-2 rounded-lg font-medium ${
-                                checkingCoupon || !coupon
-                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                              onClick={() => {
+                                setSelectedPlan(plan);
+                                setCoupon("");
+                                setCouponStatus(null);
+                              }}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                                selectedPlan?._id === plan._id
+                                  ? "bg-indigo-600 text-white"
+                                  : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
                               }`}
                             >
-                              {checkingCoupon ? (
-                                <span className="flex items-center justify-center">
-                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  Applying...
-                                </span>
-                              ) : (
-                                "Apply Coupon"
-                              )}
+                              {selectedPlan?._id === plan._id ? "Selected" : "Select"}
+                            </button>
+                          )}
+                        </div>
+
+                        {selectedPlan?._id === plan._id && (
+                          <div className="mt-3 space-y-3">
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <input
+                                type="text"
+                                placeholder="Enter coupon code"
+                                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                value={coupon}
+                                onChange={(e) => setCoupon(e.target.value)}
+                              />
+                              <button
+                                onClick={handleApplyCoupon}
+                                disabled={checkingCoupon || !coupon}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                                  checkingCoupon || !coupon
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                                }`}
+                              >
+                                {checkingCoupon ? (
+                                  <span className="flex items-center justify-center">
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Applying...
+                                  </span>
+                                ) : (
+                                  "Apply Coupon"
+                                )}
+                              </button>
+                            </div>
+
+                            {couponStatus && (
+                              <div className={`p-3 rounded-lg text-sm ${
+                                couponStatus.valid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                              }`}>
+                                {couponStatus.valid ? (
+                                  <p>🎉 Coupon applied! You saved ₹{couponStatus.discountAmount}</p>
+                                ) : (
+                                  <p>{couponStatus.message}</p>
+                                )}
+                              </div>
+                            )}
+
+                            <button
+                              onClick={handleCheckout}
+                              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-sm"
+                            >
+                              Proceed to Payment - ₹
+                              {couponStatus?.valid ? selectedPlan.price - couponStatus.discountAmount : selectedPlan.price}
                             </button>
                           </div>
-
-                          {couponStatus && (
-                            <div className={`p-3 rounded-lg ${
-                              couponStatus.valid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                            }`}>
-                              {couponStatus.valid ? (
-                                <p>🎉 Coupon applied! You saved ₹{couponStatus.discountAmount}</p>
-                              ) : (
-                                <p>{couponStatus.message}</p>
-                              )}
-                            </div>
-                          )}
-
-                          <button
-                            onClick={handleCheckout}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200"
-                          >
-                            Proceed to Payment - ₹
-                            {couponStatus?.valid ? selectedPlan.price - couponStatus.discountAmount : selectedPlan.price}
-                          </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

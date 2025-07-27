@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const Admin = require("../models/Admin");
 const generateToken = require("../utils/generateToken");
-const Plan = require("../models/Plan");
 const sendEmail = require("../utils/sendEmail");
 
 
@@ -16,24 +15,6 @@ exports.registerUser = async (req, res) => {
     if (exists) return res.status(400).json({ message: "User already exists" });
 
     const user = await User.create({ name, email, password });
-
-    // 🔐 Auto-assign Trial Plan
-    // const trialPlan = await Plan.findOne({ name: "Trial" });
-    // if (!trialPlan) return res.status(500).json({ message: "Trial plan not found" });
-
-    // const now = new Date();
-    // const endDate = new Date(now);
-    // endDate.setDate(now.getDate() + trialPlan.durationInDays);
-
-    // user.subscription = {
-    //   plan: trialPlan._id,
-    //   startDate: now,
-    //   endDate,
-    //   active: true,
-    //   paymentId: null,
-    // };
-
-    // await user.save();
 
     // 📧 Send welcome email
     const emailHtml = `
