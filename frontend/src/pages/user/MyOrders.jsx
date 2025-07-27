@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import toast from 'react-hot-toast';
 import moment from 'moment';
+import React from 'react';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -173,7 +174,7 @@ const MyOrders = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {orders.map((order) => (
-                    <>
+                    <React.Fragment key={order._id}>
                       <tr key={order._id}>
                         <td className="px-6 py-4">
                           <div className="flex items-center">
@@ -244,7 +245,7 @@ const MyOrders = () => {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

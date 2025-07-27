@@ -21,7 +21,6 @@ const ProductDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   const { user } = useAuthStore();
-  console.log(user)
 
   // Load product and check purchase status
   useEffect(() => {
