@@ -13,7 +13,15 @@ import {
   Cell
 } from "recharts";
 import { motion } from "framer-motion";
-import { FiUsers, FiDollarSign, FiBox, FiLayers, FiPieChart, FiDownload } from "react-icons/fi";
+import { 
+  FiUsers, 
+  FiDollarSign, 
+  FiBox, 
+  FiLayers, 
+  FiPieChart, 
+  FiDownload,
+  FiShoppingCart
+} from "react-icons/fi";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -80,7 +88,7 @@ const AdminDashboard = () => {
     { name: "Users", value: data.totalUsers },
     { name: "Subscriptions", value: data.totalSubscriptions },
     { name: "Products", value: data.totalProducts },
-    { name: "Categories", value: data.totalCategories },
+    { name: "Orders", value: data.totalOrders },
     { name: "Plans", value: data.totalPlans }
   ];
 
@@ -112,13 +120,19 @@ const AdminDashboard = () => {
         <StatCard
           icon={<FiDollarSign className="text-green-500" size={24} />}
           label="Total Revenue"
-          value={`₹${data.totalRevenue}`}
+          value={`₹${data.totalRevenue.toLocaleString()}`}
           variants={itemVariants}
         />
         <StatCard
           icon={<FiPieChart className="text-blue-500" size={24} />}
           label="Subscriptions"
           value={data.totalSubscriptions}
+          variants={itemVariants}
+        />
+        <StatCard
+          icon={<FiShoppingCart className="text-orange-500" size={24} />}
+          label="Total Orders"
+          value={data.totalOrders}
           variants={itemVariants}
         />
         <StatCard
@@ -131,12 +145,6 @@ const AdminDashboard = () => {
           icon={<FiLayers className="text-purple-500" size={24} />}
           label="Categories"
           value={data.totalCategories}
-          variants={itemVariants}
-        />
-        <StatCard
-          icon={<FiDownload className="text-red-500" size={24} />}
-          label="Plans"
-          value={data.totalPlans}
           variants={itemVariants}
         />
       </motion.div>

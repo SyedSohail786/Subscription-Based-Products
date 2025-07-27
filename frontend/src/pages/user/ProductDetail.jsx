@@ -311,7 +311,7 @@ const checkPurchaseStatus = async () => {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               {
-                user.subscription.active === true ? 
+                user?.subscription?.active === true ? 
                 <>
                 <button
                 onClick={() => downloadFileWithOriginalFormat(id)}
