@@ -205,7 +205,96 @@ exports.sendOtp = async (req, res) => {
     expiry: Date.now() + 10 * 60 * 1000, // 10 mins
   });
 
-  await sendEmail(email, "Reset Password OTP", `<p>Your OTP is <b>${otp}</b>. It will expire in 10 minutes.</p>`);
+  const emailHtml = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your OTP Code</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .container {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 30px;
+        background-color: #ffffff;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+      .logo {
+        max-width: 150px;
+        margin-bottom: 20px;
+      }
+      .otp-code {
+        background-color: #f5f5f5;
+        padding: 15px;
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        letter-spacing: 3px;
+        margin: 25px 0;
+        border-radius: 5px;
+        color: #3b82f6;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3b82f6;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-top: 15px;
+      }
+      .note {
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <!-- Replace with your logo -->
+        <img src="${process.env.BACKEND_URL}/uploads/DigitalStoreBanner.jpg" alt="Company Logo" class="logo">
+        <h2>Your One-Time Password (OTP)</h2>
+      </div>
+      
+      <p>Hello,</p>
+      <p>We received a request to reset your password. Please use the following OTP to verify your identity:</p>
+      
+      <div class="otp-code">${otp}</div>
+      
+      <p class="note">This OTP is valid for 10 minutes. Please do not share this code with anyone.</p>
+      
+      <p>If you didn't request this OTP, you can safely ignore this email.</p>
+      
+      <div class="footer">
+        <p>© ${new Date().getFullYear()} Digital Store. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+  </html>
+  `;
+
+  await sendEmail(email, "Your Password Reset OTP Code", emailHtml);
 
   res.status(200).json({ message: "OTP sent to your email" });
 };
