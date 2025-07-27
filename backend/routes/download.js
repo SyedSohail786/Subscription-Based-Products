@@ -8,7 +8,7 @@ router.post("/log", protect, async (req, res) => {
   try {
     const { productId } = req.body;
     await Download.create({
-      user: req.user._id,
+      user: req.userId,
       product: productId,
     });
     res.status(200).json({ success: true });

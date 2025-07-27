@@ -47,6 +47,7 @@ const ProductDetail = () => {
     };
 
     fetchData();
+    window.scrollTo(0, 0);
   }, [id]);
 
   // Check if product is in user's bag
@@ -86,6 +87,13 @@ const checkPurchaseStatus = async () => {
   const downloadFileWithOriginalFormat = async (productId) => {
     try {
       // First get product details to extract filename and extension
+
+      const res = await axios.post(`${BACKEND_URL}/api/download/log`, {
+        productId: productId
+      }, {
+        withCredentials: true
+      });
+      
       const productRes = await axios.get(
         `${BACKEND_URL}/api/products/${productId}`,
         { withCredentials: true }
@@ -206,6 +214,8 @@ const checkPurchaseStatus = async () => {
       }
     }
   };
+
+  
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen">
@@ -382,7 +392,9 @@ const checkPurchaseStatus = async () => {
           </div>
           
           {hasPurchased ? (
-            <form onSubmit={handleCommentSubmit} className="mb-6 bg-gray-50 p-4 rounded-lg">
+            <>{
+              user._id !== comments[0]?.user._id ? (
+                <form onSubmit={handleCommentSubmit} className="mb-6 bg-gray-50 p-4 rounded-lg">
               <h4 className="font-medium text-gray-800 mb-2">Write a review</h4>
               <div className="flex items-center mb-3">
                 <div className="flex mr-2">
@@ -424,6 +436,12 @@ const checkPurchaseStatus = async () => {
                 Submit Review
               </button>
             </form>
+              ) : (
+                <p className="text-gray-500 mb-5">You have already reviewed this product</p>
+              )
+            }
+            
+            </>
           ) : (
             <div className="bg-blue-50 p-4 rounded-lg mb-6">
               <p className="text-blue-800">

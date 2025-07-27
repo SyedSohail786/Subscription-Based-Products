@@ -1,3 +1,4 @@
+const Download = require('../models/Download');
 const Order = require('../models/Order');
 
 exports.getMyOrders = async (req, res) => {
@@ -27,6 +28,10 @@ exports.getMyOrders = async (req, res) => {
      try {
        const { productId } = req.params;
        const userId = req.user._id;
+       const downloadUserId = await Download.findOne({ user: userId, product: productId });
+       if (downloadUserId) {
+        return res.json({ hasPurchased: true });
+       }
    
        // Check if there's a completed order for this user and product
        const order = await Order.findOne({

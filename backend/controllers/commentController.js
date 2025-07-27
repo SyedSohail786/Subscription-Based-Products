@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Comment = require("../models/Comment");
 const Order = require("../models/Order");
+const Download = require("../models/Download");
 
 exports.createComment = async (req, res) => {
   try {
@@ -16,11 +17,14 @@ exports.createComment = async (req, res) => {
     }
 
     // Check if user has purchased the product by looking at orders
-    const order = await Order.findOne({
+    let order = await Order.findOne({
       user: req.user._id,
       product: productId,
       status: "completed"
     });
+    if(!order){
+      order = await Download.findOne({ user: req.user._id, product: productId });
+    }
 
     if (!order) {
       return res.status(403).json({ message: "Only customers who purchased this product can review it" });
