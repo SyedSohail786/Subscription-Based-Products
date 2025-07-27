@@ -12,7 +12,7 @@ const SearchInput = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="border-2 border-indigo-500 rounded-full">
       <FiSearch className="absolute left-3 top-3.5 text-gray-400" />
       <input
         type="text"

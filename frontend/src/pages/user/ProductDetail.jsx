@@ -35,7 +35,7 @@ const ProductDetail = () => {
         setAverageRating(productRes.data.averageRating || 0);
         setTotalReviews(productRes.data.reviewCount || 0);
         setComments(commentsRes.data.comments || []);
-        
+
         await checkBagStatus();
         await checkPurchaseStatus();
       } catch (err) {
@@ -68,20 +68,20 @@ const ProductDetail = () => {
   };
 
   // Check if user has purchased the product
-const checkPurchaseStatus = async () => {
-  try {
-    const res = await axios.get(`${BACKEND_URL}/api/orders/check-purchase/${id}`, {
-      withCredentials: true,
-    });
-    setHasPurchased(res.data.hasPurchased);
-  } catch (err) {
-    if (err.response?.status === 401) {
-      setHasPurchased(false);
-    } else {
-      console.error("Failed to check purchase status", err);
+  const checkPurchaseStatus = async () => {
+    try {
+      const res = await axios.get(`${BACKEND_URL}/api/orders/check-purchase/${id}`, {
+        withCredentials: true,
+      });
+      setHasPurchased(res.data.hasPurchased);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setHasPurchased(false);
+      } else {
+        console.error("Failed to check purchase status", err);
+      }
     }
-  }
-};
+  };
 
   // Handle product download
   const downloadFileWithOriginalFormat = async (productId) => {
@@ -93,18 +93,18 @@ const checkPurchaseStatus = async () => {
       }, {
         withCredentials: true
       });
-      
+
       const productRes = await axios.get(
         `${BACKEND_URL}/api/products/${productId}`,
         { withCredentials: true }
       );
-      
+
       const product = productRes.data;
       const fileUrl = `${BACKEND_URL}/${product.fileUrl.replace(/\\/g, "/")}`;
-      
+
       // Extract filename with extension from fileUrl
       const fileName = fileUrl.split('/').pop();
-      
+
       // Fetch the file with proper headers
       const response = await fetch(fileUrl, {
         credentials: 'include',
@@ -112,12 +112,12 @@ const checkPurchaseStatus = async () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+
       if (!response.ok) throw new Error('Failed to fetch file');
-      
+
       // Get the blob data
       const blob = await response.blob();
-      
+
       // Create download link
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -125,11 +125,11 @@ const checkPurchaseStatus = async () => {
       link.setAttribute('download', fileName); // Use original filename
       document.body.appendChild(link);
       link.click();
-      
+
       // Clean up
       window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(link);
-      
+
       toast.success("File downloaded in original format!");
     } catch (error) {
       console.error("Download error:", error);
@@ -193,7 +193,7 @@ const checkPurchaseStatus = async () => {
         { text: commentText, rating },
         { withCredentials: true }
       );
-      
+
       setComments((prev) => [res.data, ...prev]);
       setCommentText("");
       setRating(0);
@@ -201,7 +201,7 @@ const checkPurchaseStatus = async () => {
 
       const newAverage = (
         (parseFloat(averageRating) * totalReviews + rating
-      ) / (totalReviews + 1));
+        ) / (totalReviews + 1));
       setAverageRating(newAverage.toFixed(1));
       setTotalReviews(totalReviews + 1);
     } catch (err) {
@@ -215,7 +215,7 @@ const checkPurchaseStatus = async () => {
     }
   };
 
-  
+
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen">
@@ -234,15 +234,17 @@ const checkPurchaseStatus = async () => {
       <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
         <div className="md:flex">
           {/* Product Image */}
-          <div className="md:w-1/3 p-6 flex items-center justify-center bg-gray-50">
-            <img
-              className="max-h-96 w-auto object-contain rounded-lg"
-              src={`${BACKEND_URL}/${product.imageUrl}`}
-              alt={product.title}
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/300x450?text=No+Image";
-              }}
-            />
+          <div className="md:w-1/3 p-6 bg-gray-50">
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
+              <img
+                className="absolute inset-0 w-full h-full object-contain bg-white"
+                src={`${BACKEND_URL}/${product.imageUrl}`}
+                alt={product.title}
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/300x450?text=No+Image";
+                }}
+              />
+            </div>
           </div>
 
           {/* Product Details */}
@@ -311,32 +313,31 @@ const checkPurchaseStatus = async () => {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               {
-                user?.subscription?.active === true ? 
-                <>
-                <button
-                onClick={() => downloadFileWithOriginalFormat(id)}
-                className="flex-1 bg-yellow-300 hover:bg-yellow-400 text-black font-medium py-3 px-6 rounded-md transition transform hover:scale-105"
-              >
-                Premium Download
-              </button>
-              </>
-              :
-              <button
-                onClick={handleBuyNow}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md transition transform hover:scale-105"
-              >
-                Buy Now
-              </button>
+                user?.subscription?.active === true ?
+                  <>
+                    <button
+                      onClick={() => downloadFileWithOriginalFormat(id)}
+                      className="flex-1 bg-yellow-300 hover:bg-yellow-400 text-black font-medium py-3 px-6 rounded-md transition transform hover:scale-105"
+                    >
+                      Premium Download
+                    </button>
+                  </>
+                  :
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md transition transform hover:scale-105"
+                  >
+                    Buy Now
+                  </button>
               }
-              
-              
+
+
               <button
                 onClick={handleToggleLibrary}
-                className={`flex-1 font-medium py-3 px-6 rounded-md transition transform hover:scale-105 ${
-                  inBag 
+                className={`flex-1 font-medium py-3 px-6 rounded-md transition transform hover:scale-105 ${inBag
                     ? "bg-red-100 hover:bg-red-200 text-red-800 border border-red-200"
                     : "bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200"
-                }`}
+                  }`}
               >
                 {inBag ? (
                   <span className="flex items-center justify-center gap-2">
@@ -390,57 +391,57 @@ const checkPurchaseStatus = async () => {
               )}
             </div>
           </div>
-          
+
           {hasPurchased ? (
             <>{
               user._id !== comments[0]?.user._id ? (
                 <form onSubmit={handleCommentSubmit} className="mb-6 bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-medium text-gray-800 mb-2">Write a review</h4>
-              <div className="flex items-center mb-3">
-                <div className="flex mr-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      className="focus:outline-none"
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setRating(star)}
-                    >
-                      <svg
-                        className={`w-6 h-6 ${(hoverRating || rating) >= star ? 'text-yellow-400' : 'text-gray-300'}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    </button>
-                  ))}
-                </div>
-                <span className="text-sm text-gray-600">
-                  {hoverRating > 0 ? hoverRating : rating > 0 ? rating : ''} star{hoverRating > 1 || rating > 1 ? 's' : ''}
-                </span>
-              </div>
-              <textarea
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Share your thoughts about this product..."
-                className="w-full border border-gray-300 rounded-md p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                rows="3"
-                required
-              />
-              <button
-                type="submit"
-                className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-              >
-                Submit Review
-              </button>
-            </form>
+                  <h4 className="font-medium text-gray-800 mb-2">Write a review</h4>
+                  <div className="flex items-center mb-3">
+                    <div className="flex mr-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          className="focus:outline-none"
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => setRating(star)}
+                        >
+                          <svg
+                            className={`w-6 h-6 ${(hoverRating || rating) >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {hoverRating > 0 ? hoverRating : rating > 0 ? rating : ''} star{hoverRating > 1 || rating > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Share your thoughts about this product..."
+                    className="w-full border border-gray-300 rounded-md p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    rows="3"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                  >
+                    Submit Review
+                  </button>
+                </form>
               ) : (
                 <p className="text-gray-500 mb-5">You have already reviewed this product</p>
               )
             }
-            
+
             </>
           ) : (
             <div className="bg-blue-50 p-4 rounded-lg mb-6">
