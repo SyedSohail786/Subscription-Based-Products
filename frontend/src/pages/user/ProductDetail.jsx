@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import moment from "moment";
+import useAuthStore from "../../store/authStore";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -19,6 +20,8 @@ const ProductDetail = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
+  const { user } = useAuthStore();
+  console.log(user)
 
   // Load product and check purchase status
   useEffect(() => {
@@ -79,6 +82,53 @@ const checkPurchaseStatus = async () => {
     }
   }
 };
+
+  // Handle product download
+  const downloadFileWithOriginalFormat = async (productId) => {
+    try {
+      // First get product details to extract filename and extension
+      const productRes = await axios.get(
+        `${BACKEND_URL}/api/products/${productId}`,
+        { withCredentials: true }
+      );
+      
+      const product = productRes.data;
+      const fileUrl = `${BACKEND_URL}/${product.fileUrl.replace(/\\/g, "/")}`;
+      
+      // Extract filename with extension from fileUrl
+      const fileName = fileUrl.split('/').pop();
+      
+      // Fetch the file with proper headers
+      const response = await fetch(fileUrl, {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch file');
+      
+      // Get the blob data
+      const blob = await response.blob();
+      
+      // Create download link
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', fileName); // Use original filename
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(link);
+      
+      toast.success("File downloaded in original format!");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download file");
+    }
+  };
 
   // Handle product purchase
   const handleBuyNow = async () => {
@@ -251,12 +301,25 @@ const checkPurchaseStatus = async () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              {
+                user.subscription.active === true ? 
+                <>
+                <button
+                onClick={() => downloadFileWithOriginalFormat(id)}
+                className="flex-1 bg-yellow-300 hover:bg-yellow-400 text-black font-medium py-3 px-6 rounded-md transition transform hover:scale-105"
+              >
+                Premium Download
+              </button>
+              </>
+              :
               <button
                 onClick={handleBuyNow}
                 className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md transition transform hover:scale-105"
               >
                 Buy Now
               </button>
+              }
+              
               
               <button
                 onClick={handleToggleLibrary}
