@@ -11,13 +11,13 @@ const userSchema = new mongoose.Schema(
     // Subscriptions
     subscription: {
       plan: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId, default: null,
         ref: 'Plan',
       },
-      startDate: Date,
-      endDate: Date,
+      startDate: { type: Date, default: null },
+      endDate: { type: Date, default: null },
       active: { type: Boolean, default: false },
-      paymentId: String,
+      paymentId: { type: String, default: null },
     },
 
     // Free trial tracking

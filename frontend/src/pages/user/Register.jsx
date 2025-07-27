@@ -13,6 +13,7 @@ const Register = () => {
     try {
       setIsLoading(true);
       await register(form);
+      toast.success("Registration successful, please login to continue");
       navigate("/login");
     } catch(err) {
       toast.error(err.response?.data?.message || "Registration failed");

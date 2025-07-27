@@ -114,7 +114,13 @@ const UserProfile = () => {
                 <p><span className="font-medium text-gray-700">Member Since:</span> {moment(createdAt).format("MMMM D, YYYY")}</p>
               </div>
             </div>
-
+            {
+              user.subscription.paymentId === null ?
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">Subscription Details</h2>
+                <p>You have not purchased any plan yet</p>
+              </div>
+              :
             <div className="bg-gray-50 p-4 rounded-lg">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">Subscription Details</h2>
               {subscription && subscription.plan ? (
@@ -141,6 +147,8 @@ const UserProfile = () => {
                 <p className="text-gray-600">No active subscription</p>
               )}
             </div>
+              
+            }
           </div>
 
           <button
@@ -150,7 +158,13 @@ const UserProfile = () => {
             }}
             className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center justify-center"
           >
-            Change Plan
+            {
+              user.subscription.paymentId === null ?
+              "Buy Plan"
+              :
+              "Change Plan"
+            }
+            
           </button>
         </div>
       </div>

@@ -18,22 +18,22 @@ exports.registerUser = async (req, res) => {
     const user = await User.create({ name, email, password });
 
     // 🔐 Auto-assign Trial Plan
-    const trialPlan = await Plan.findOne({ name: "Trial" });
-    if (!trialPlan) return res.status(500).json({ message: "Trial plan not found" });
+    // const trialPlan = await Plan.findOne({ name: "Trial" });
+    // if (!trialPlan) return res.status(500).json({ message: "Trial plan not found" });
 
-    const now = new Date();
-    const endDate = new Date(now);
-    endDate.setDate(now.getDate() + trialPlan.durationInDays);
+    // const now = new Date();
+    // const endDate = new Date(now);
+    // endDate.setDate(now.getDate() + trialPlan.durationInDays);
 
-    user.subscription = {
-      plan: trialPlan._id,
-      startDate: now,
-      endDate,
-      active: true,
-      paymentId: null,
-    };
+    // user.subscription = {
+    //   plan: trialPlan._id,
+    //   startDate: now,
+    //   endDate,
+    //   active: true,
+    //   paymentId: null,
+    // };
 
-    await user.save();
+    // await user.save();
 
     // 📧 Send welcome email
     const emailHtml = `
@@ -46,17 +46,7 @@ exports.registerUser = async (req, res) => {
       <p style="font-size: 16px;">Hi <strong>${name}</strong>,</p>
       
       <p style="font-size: 15px;">
-        We're excited to have you on board! Your account has been successfully created and your free <strong>Trial Plan</strong> is now active. Here's what you get:
-      </p>
-
-      <ul style="font-size: 15px; line-height: 1.6; padding-left: 20px;">
-        <li>✅ Access to all trial products</li>
-        <li>📥 Download up to 5 digital items</li>
-        <li>📅 Plan valid for <strong>${trialPlan.durationInDays} days</strong> (until <strong>${endDate.toDateString()}</strong>)</li>
-      </ul>
-
-      <p style="font-size: 15px;">
-        You can now browse digital assets, download up to 5 items during your trial, and upgrade anytime to unlock full access.
+        We're excited to have you on board! Your account has been successfully created.
       </p>
 
       <div style="text-align: center; margin: 24px 0;">

@@ -8,14 +8,14 @@ import ClickSpark from './components/ClickSpark.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ClickSpark
-  sparkColor='#fff'
-  sparkSize={10}
-  sparkRadius={15}
-  sparkCount={8}
-  duration={400}
->
-  <App />
-</ClickSpark>
+      sparkColor='#fff'
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
+      <App />
+    </ClickSpark>
     <Toaster />
   </StrictMode>,
 )
