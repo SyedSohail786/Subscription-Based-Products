@@ -11,6 +11,7 @@ export default function AdminCategories() {
   const [editId, setEditId] = useState(null);
   const [editName, setEditName] = useState('');
   const [editSubcategories, setEditSubcategories] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState("")
 
   const fetchCategories = async () => {
     try {
@@ -29,21 +30,24 @@ export default function AdminCategories() {
     if (!name.trim()) {
       return toast.error("Name is required");
     }
-
+      setIsSubmitting("Adding")
     const subs = subcategories.split(',').map(s => s.trim()).filter(s => s);
 
     try {
       await axios.post(`${BACKEND_URL}/api/categories`, { name, subcategories: subs }, { withCredentials: true });
+      setIsSubmitting("")
       toast.success("Category added");
       setName('');
       setSubcategories('');
       fetchCategories();
     } catch (err) {
+      setIsSubmitting("")
       toast.error(err.response?.data?.error || "Create failed");
     }
   };
 
   const updateCategory = async () => {
+    setIsSubmitting("Updating")
     if (!editName.trim()) {
       return toast.error("Name is required");
     }
@@ -52,12 +56,14 @@ export default function AdminCategories() {
 
     try {
       await axios.put(`${BACKEND_URL}/api/categories/${editId}`, { name: editName, subcategories: subs }, { withCredentials: true });
+      setIsSubmitting("")
       toast.success("Category updated");
       setEditId(null);
       setEditName('');
       setEditSubcategories('');
       fetchCategories();
     } catch (err) {
+      setIsSubmitting("")
       toast.error(err.response?.data?.error || "Update failed");
     }
   };
@@ -95,7 +101,9 @@ export default function AdminCategories() {
             onClick={createCategory}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-sm"
           >
-            Add Category
+            {
+              isSubmitting === "Adding" ? "Adding..." : "Add Category"
+            }
           </button>
         </div>
       </div>
@@ -129,7 +137,7 @@ export default function AdminCategories() {
                         onClick={updateCategory}
                         className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium"
                       >
-                        Save
+                       { isSubmitting === "Updating" ? "Updating..." : "Update" }
                       </button>
                       <button
                         onClick={() => setEditId(null)}

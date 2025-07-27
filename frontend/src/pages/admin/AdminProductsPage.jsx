@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAdminProductStore } from '../../store/adminProductStore';
 import AdminCategories from './AdminCategories';
-import { FiEdit2, FiTrash2, FiPlus, FiX, FiCheck, FiFile, FiImage } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiPlus, FiX, FiCheck, FiFile, FiImage, FiPackage, FiGrid } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
@@ -183,7 +183,7 @@ export default function AdminProductsPage() {
 
   const startEdit = (product) => {
     if (!product) return;
-
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setEditId(product._id);
     setEditForm({
       title: product.title || '',
@@ -291,363 +291,446 @@ export default function AdminProductsPage() {
     setEditPreview({ file: '', image: '' });
   };
 
-  const createTagOptions = (tagsString) => {
-    if (!tagsString) return [];
-    return tagsString.split(',').map(tag => ({
-      value: tag.trim(),
-      label: tag.trim()
-    }));
-  };
-
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex border-b border-gray-200 mb-6">
-        <button
-          onClick={() => setSection('products')}
-          className={`px-4 py-3 font-medium ${section === 'products'
-            ? 'text-indigo-600 border-b-2 border-indigo-600'
-            : 'text-gray-500 hover:text-gray-700'}`}
-        >
-          Products
-        </button>
-        <button
-          onClick={() => setSection('categories')}
-          className={`px-4 py-3 font-medium ${section === 'categories'
-            ? 'text-indigo-600 border-b-2 border-indigo-600'
-            : 'text-gray-500 hover:text-gray-700'}`}
-        >
-          Categories
-        </button>
-      </div>
-
-      {section === 'categories' ? (
-        <AdminCategories />
-      ) : (
-        <>
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              {editId ? 'Edit Product' : 'Add New Product'}
-            </h2>
-
-            <form onSubmit={editId ? handleUpdate : handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title*</label>
-                <input
-                  name="title"
-                  value={editId ? editForm.title : form.title}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
-                <input
-                  name="shortDescription"
-                  value={editId ? editForm.shortDescription || '' : form.shortDescription || ''}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-                <Select
-                  options={categoryOptions}
-                  value={editId ? editForm.category : form.category}
-                  onChange={editId ? handleEditCategoryChange : handleCategoryChange}
-                  classNamePrefix="react-select"
-                  isClearable
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
-                <Select
-                  options={subcategoryOptions}
-                  value={editId ? editForm.subcategory : form.subcategory}
-                  onChange={editId ? handleEditSubcategoryChange : handleSubcategoryChange}
-                  classNamePrefix="react-select"
-                  isClearable
-                  placeholder="Select subcategory"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">About the Book / Audio</label>
-                <textarea
-                  name="about"
-                  rows="3"
-                  value={editId ? editForm.about || '' : form.about || ''}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Author Name</label>
-                <input
-                  name="author"
-                  value={editId ? editForm.author || '' : form.author || ''}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Release Date</label>
-                <input
-                  type="date"
-                  name="releaseDate"
-                  value={editId ? editForm.releaseDate || '' : form.releaseDate || ''}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  max={new Date().toISOString().split('T')[0]} // This sets max date to today
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price*</label>
-                <input
-                  type="number"
-                  name="price"
-                  value={editId ? editForm.price || '' : form.price || ''}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-                <input
-                  type="text"
-                  name="tagsInput"
-                  value={editId ? editForm.tagsInput || '' : form.tagsInput || ''}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  placeholder="e.g. fiction, thriller, AI"
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Return Available</label>
-                <select
-                  name="returnAvailable"
-                  value={editId ? editForm.returnAvailable || 'false' : form.returnAvailable || 'false'}
-                  onChange={editId ? handleEditChange : handleFormChange}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg"
-                >
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product File</label>
-                <div className="flex items-center">
-                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg border border-gray-300 flex items-center">
-                    <FiFile className="mr-2" />
-                    Choose File
-                    <input
-                      type="file"
-                      name="file"
-                      accept=".pdf,.zip"
-                      onChange={editId ? handleEditChange : handleFormChange}
-                      ref={fileInputRef}
-                      className="hidden"
-                    />
-                  </label>
-                  <span className="ml-2 text-sm text-gray-500 truncate max-w-xs">
-                    {editId
-                      ? (editForm.file?.name || (editPreview.file ? 'Current file' : 'No file'))
-                      : (form.file?.name || 'No file selected')}
-                  </span>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 sm:p-8 text-white">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <FiPackage className="w-8 h-8" />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-bold">Product Management</h1>
+                  <p className="text-white/90">Manage your products and categories</p>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-                <div className="flex items-center">
-                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg border border-gray-300 flex items-center">
-                    <FiImage className="mr-2" />
-                    Choose Image
-                    <input
-                      type="file"
-                      name="image"
-                      accept="image/*"
-                      onChange={editId ? handleEditChange : handleFormChange}
-                      ref={imageInputRef}
-                      className="hidden"
-                    />
-                  </label>
-                  {(editId ? editPreview.image : preview.image) && (
-                    <img
-                      src={editId ? editPreview.image : preview.image}
-                      alt="Preview"
-                      className="h-10 w-10 ml-2 rounded object-cover"
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="md:col-span-2 flex justify-end space-x-3 pt-2">
-                {editId && (
-                  <button
-                    type="button"
-                    onClick={cancelEdit}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                    disabled={isUpdating}
-                  >
-                    <FiX className="inline mr-2" />
-                    Cancel
-                  </button>
-                )}
+            </div>
+            
+            {/* Tab Navigation */}
+            <div className="p-6 sm:p-8 border-b border-gray-200">
+              <div className="flex space-x-1 bg-gray-100 rounded-xl p-1">
                 <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center disabled:opacity-50"
-                  disabled={isCreating || isUpdating}
+                  onClick={() => setSection('products')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg transition-all duration-200 ${
+                    section === 'products'
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
-                  {editId ? (
-                    <>
-                      {isUpdating ? (
-                        'Updating...'
-                      ) : (
-                        <>
-                          <FiCheck className="inline mr-2" />
-                          Update Product
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {isCreating ? (
-                        'Creating...'
-                      ) : (
-                        <>
-                          <FiPlus className="inline mr-2" />
-                          Add Product
-                        </>
-                      )}
-                    </>
-                  )}
+                  <FiPackage className="w-4 h-4" />
+                  Products
+                </button>
+                <button
+                  onClick={() => setSection('categories')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg transition-all duration-200 ${
+                    section === 'categories'
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FiGrid className="w-4 h-4" />
+                  Categories
                 </button>
               </div>
-            </form>
+            </div>
           </div>
+        </div>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <h2 className="text-xl font-semibold p-6 text-gray-800">Product List</h2>
-
-            {loading ? (
-              <div className="p-8">
-                <div className="animate-pulse space-y-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-gray-200 rounded"></div>
-                  ))}
+        {section === 'categories' ? (
+          <AdminCategories />
+        ) : (
+          <>
+            {/* Product Form */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  {editId ? <FiEdit2 className="w-5 h-5 text-green-600" /> : <FiPlus className="w-5 h-5 text-green-600" />}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    {editId ? 'Edit Product' : 'Add New Product'}
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    {editId ? 'Update product information' : 'Create a new product listing'}
+                  </p>
                 </div>
               </div>
-            ) : !products?.length ? (
-              <div className="text-center p-8 text-gray-500">No products found</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {products?.map((product) => (
-                      product && (
-                        <motion.tr
-                          key={product._id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="hover:bg-gray-50"
-                        >
-                          <td className="px-6 py-4">
-                            <div className="flex items-center min-w-[200px]">
-                              {product?.imageUrl ? (
-                                <img
-                                  src={`${BACKEND_URL}/${product.imageUrl}`}
-                                  alt={product.title || 'Product'}
-                                  className="h-10 w-10 rounded-full object-cover mr-3"
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <FiImage className="text-gray-400" />
-                                </div>
-                              )}
-                              <div className="min-w-0">
-                                <div className="text-sm font-medium text-gray-900 truncate">
-                                  {product.title || 'Untitled Product'}
+
+              <form onSubmit={editId ? handleUpdate : handleCreate} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Title*</label>
+                    <input
+                      name="title"
+                      value={editId ? editForm.title : form.title}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      placeholder="Enter product title"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Short Description</label>
+                    <input
+                      name="shortDescription"
+                      value={editId ? editForm.shortDescription || '' : form.shortDescription || ''}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      placeholder="Brief description of the product"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Category*</label>
+                    <Select
+                      options={categoryOptions}
+                      value={editId ? editForm.category : form.category}
+                      onChange={editId ? handleEditCategoryChange : handleCategoryChange}
+                      classNamePrefix="react-select"
+                      className="react-select-container"
+                      isClearable
+                      placeholder="Select category"
+                      menuPortalTarget={document.body}
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        menu: (base) => ({ ...base, zIndex: 9999 })
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Subcategory</label>
+                    <Select
+                      options={subcategoryOptions}
+                      value={editId ? editForm.subcategory : form.subcategory}
+                      onChange={editId ? handleEditSubcategoryChange : handleSubcategoryChange}
+                      classNamePrefix="react-select"
+                      className="react-select-container"
+                      isClearable
+                      placeholder="Select subcategory"
+                      menuPortalTarget={document.body}
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        menu: (base) => ({ ...base, zIndex: 9999 })
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Author Name</label>
+                    <input
+                      name="author"
+                      value={editId ? editForm.author || '' : form.author || ''}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      placeholder="Author or creator name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Release Date</label>
+                    <input
+                      type="date"
+                      name="releaseDate"
+                      value={editId ? editForm.releaseDate || '' : form.releaseDate || ''}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      max={new Date().toISOString().split('T')[0]}
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">About the Book / Audio</label>
+                    <textarea
+                      name="about"
+                      rows="4"
+                      value={editId ? editForm.about || '' : form.about || ''}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
+                      placeholder="Detailed description about the product"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Price*</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">₹</span>
+                      <input
+                        type="number"
+                        name="price"
+                        value={editId ? editForm.price || '' : form.price || ''}
+                        onChange={editId ? handleEditChange : handleFormChange}
+                        className="w-full pl-8 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Tags (comma separated)</label>
+                    <input
+                      type="text"
+                      name="tagsInput"
+                      value={editId ? editForm.tagsInput || '' : form.tagsInput || ''}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      placeholder="e.g. fiction, thriller, AI"
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Return Available</label>
+                    <select
+                      name="returnAvailable"
+                      value={editId ? editForm.returnAvailable || 'false' : form.returnAvailable || 'false'}
+                      onChange={editId ? handleEditChange : handleFormChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    >
+                      <option value="false">No</option>
+                      <option value="true">Yes</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Product File</label>
+                      <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 hover:border-indigo-300 flex items-center justify-center transition-all duration-200">
+                        <FiFile className="mr-2 text-gray-500" />
+                        <span className="text-sm text-gray-600">Choose File</span>
+                        <input
+                          type="file"
+                          name="file"
+                          accept=".pdf,.zip"
+                          onChange={editId ? handleEditChange : handleFormChange}
+                          ref={fileInputRef}
+                          className="hidden"
+                        />
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1 truncate">
+                        {editId
+                          ? (editForm.file?.name || (editPreview.file ? 'Current file' : 'No file'))
+                          : (form.file?.name || 'No file selected')}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Product Image</label>
+                      <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 hover:border-indigo-300 flex items-center justify-center transition-all duration-200">
+                        <FiImage className="mr-2 text-gray-500" />
+                        <span className="text-sm text-gray-600">Choose Image</span>
+                        <input
+                          type="file"
+                          name="image"
+                          accept="image/*"
+                          onChange={editId ? handleEditChange : handleFormChange}
+                          ref={imageInputRef}
+                          className="hidden"
+                        />
+                      </label>
+                      {(editId ? editPreview.image : preview.image) && (
+                        <img
+                          src={editId ? editPreview.image : preview.image}
+                          alt="Preview"
+                          className="h-16 w-16 mt-2 rounded-xl object-cover border-2 border-gray-200"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-2 flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                  {editId && (
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium flex items-center"
+                      disabled={isUpdating}
+                    >
+                      <FiX className="mr-2" />
+                      Cancel
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium flex items-center disabled:opacity-50 shadow-lg hover:shadow-xl"
+                    disabled={isCreating || isUpdating}
+                  >
+                    {editId ? (
+                      <>
+                        {isUpdating ? (
+                          'Updating...'
+                        ) : (
+                          <>
+                            <FiCheck className="mr-2" />
+                            Update Product
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {isCreating ? (
+                          'Creating...'
+                        ) : (
+                          <>
+                            <FiPlus className="mr-2" />
+                            Add Product
+                          </>
+                        )}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Products List */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6 sm:p-8 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <FiPackage className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Product List</h2>
+                    <p className="text-sm text-gray-600">{products?.length || 0} products total</p>
+                  </div>
+                </div>
+              </div>
+
+              {loading ? (
+                <div className="p-8">
+                  <div className="animate-pulse space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-16 bg-gray-200 rounded-xl"></div>
+                    ))}
+                  </div>
+                </div>
+              ) : !products?.length ? (
+                <div className="text-center p-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FiPackage className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
+                  <p className="text-gray-600">Get started by adding your first product</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Subcategory</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tags</th>
+                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {products?.map((product) => (
+                        product && (
+                          <motion.tr
+                            key={product._id}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="hover:bg-gray-50 transition-colors"
+                          >
+                            <td className="px-6 py-4">
+                              <div className="flex items-center min-w-[200px]">
+                                {product?.imageUrl ? (
+                                  <img
+                                    src={`${BACKEND_URL}/${product.imageUrl}`}
+                                    alt={product.title || 'Product'}
+                                    className="h-12 w-12 rounded-xl object-cover mr-3 border border-gray-200"
+                                  />
+                                ) : (
+                                  <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center mr-3">
+                                    <FiImage className="text-gray-400" />
+                                  </div>
+                                )}
+                                <div className="min-w-0">
+                                  <div className="text-sm font-semibold text-gray-900 truncate">
+                                    {product.title || 'Untitled Product'}
+                                  </div>
+                                  <div className="text-xs text-gray-500 truncate">
+                                    by {product.author || 'Unknown Author'}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {product.category?.name || 'Uncategorized'}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {product.subcategory || '-'}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              ₹{product.price || '0'}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 max-w-[200px]">
-                            <div className="flex flex-wrap gap-1">
-                              {product.tags?.map((tag, index) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800 truncate max-w-[100px]"
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                {product.category?.name || 'Uncategorized'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {product.subcategory || '-'}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-semibold text-gray-900">
+                                ₹{product.price || '0'}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 max-w-[200px]">
+                              <div className="flex flex-wrap gap-1">
+                                {product.tags?.slice(0, 2).map((tag, index) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 truncate max-w-[80px]"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                                {product.tags?.length > 2 && (
+                                  <span className="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-600">
+                                    +{product.tags.length - 2}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <div className="flex items-center justify-end space-x-2">
+                                <button
+                                  onClick={() => startEdit(product)}
+                                  className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors"
+                                  title="Edit Product"
                                 >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button
-                              onClick={() => startEdit(product)}
-                              className="text-indigo-600 hover:text-indigo-900 mr-4"
-                            >
-                              <FiEdit2 className="inline mr-1" /> Edit
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this product?')) {
-                                  deleteProduct(product._id);
-                                }
-                              }}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              <FiTrash2 className="inline mr-1" /> Delete
-                            </button>
-                          </td>
-                        </motion.tr>
-                      )
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </>
-      )}
+                                  <FiEdit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (window.confirm('Are you sure you want to delete this product?')) {
+                                      deleteProduct(product._id);
+                                    }
+                                  }}
+                                  className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Delete Product"
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        )
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

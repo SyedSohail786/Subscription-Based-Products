@@ -103,7 +103,7 @@ const BuyProductPayment = () => {
           );
           
           if (verifyRes.data.success) {
-            toast.success("Payment Successful! Product added to your library.");
+            toast.success("Payment Successful!.");
             // Download file in original format
             await downloadFileWithOriginalFormat(productId);
             navigate("/my-orders");

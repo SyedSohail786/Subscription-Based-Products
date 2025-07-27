@@ -76,7 +76,6 @@ export const useAdminProductStore = create((set) => ({
         }
       });
 
-      toast.success('Product updated successfully');
       set((state) => ({
         products: state.products.map((p) => 
           p._id === id ? { ...p, ...res.data?.product } : p

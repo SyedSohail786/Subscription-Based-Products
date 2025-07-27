@@ -22,6 +22,7 @@ const ProductDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   const { user } = useAuthStore();
+  const [isLoading, setIsLoating]= useState("")
 
   // Load product and check purchase status
   useEffect(() => {
@@ -87,8 +88,9 @@ const ProductDetail = () => {
   // Handle product download
   const downloadFileWithOriginalFormat = async (productId) => {
     try {
-      // First get product details to extract filename and extension
 
+      // First get product details to extract filename and extension
+      setIsLoating("isDownloadingTrue")
       const res = await axios.post(`${BACKEND_URL}/api/download/log`, {
         productId: productId
       }, {
@@ -130,7 +132,7 @@ const ProductDetail = () => {
       // Clean up
       window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(link);
-
+      setIsLoating("")
       toast.success("File downloaded in original format!");
     } catch (error) {
       console.error("Download error:", error);
@@ -160,11 +162,13 @@ const ProductDetail = () => {
   // Add or remove from bag
   const handleToggleLibrary = async () => {
     try {
+      setIsLoating("isAddToBagTrue")
       const action = inBag ? 'remove-from-library' : 'add-to-library';
       const url = `${BACKEND_URL}/api/user/${action}/${id}`;
 
       await axios.post(url, {}, { withCredentials: true });
       setInBag(!inBag);
+      setIsLoating("")
       toast.success(inBag ? "Removed from Bag" : "Added to Bag");
     } catch (err) {
       if (err.response?.status === 401) {
@@ -179,6 +183,7 @@ const ProductDetail = () => {
   // Submit new comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+    setIsLoating("isCommentSubmittingTrue")
     if (!commentText.trim()) {
       toast.error("Comment cannot be empty");
       return;
@@ -205,6 +210,7 @@ const ProductDetail = () => {
         ) / (totalReviews + 1));
       setAverageRating(newAverage.toFixed(1));
       setTotalReviews(totalReviews + 1);
+      setIsLoating("")
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate("/login");
@@ -348,7 +354,8 @@ const ProductDetail = () => {
                     className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     <FiDownload className="w-5 h-5" />
-                    Premium Download
+                    { isLoading === "isDownloadingTrue" ? "Downloading..." : "Premium Download"}
+                    
                   </button>
                 ) : (
                   <button
@@ -369,7 +376,7 @@ const ProductDetail = () => {
                   }`}
                 >
                   <FiShoppingBag className="w-5 h-5" />
-                  {inBag ? "Remove from Bag" : "Add to Bag"}
+                  {inBag ? "Remove from Bag" : isLoading ==="isAddToBagTrue"? "Adding to Bag...": "Add to Bag"}
                 </button>
               </div>
             </div>
@@ -428,9 +435,15 @@ const ProductDetail = () => {
                         />
                         <button
                           type="submit"
-                          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+                          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold flex py-3 px-6 rounded-xl transition-colors"
                         >
-                          Submit Review
+                          { isLoading === "isCommentSubmittingTrue" ? 
+                          <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>Submitting...
+                          </> : "Submit Review"}
                         </button>
                       </form>
                     </div>
