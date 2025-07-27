@@ -77,7 +77,7 @@ const Navbar = () => {
       {/* Desktop Navbar */}
       <nav 
         ref={navbarRef}
-        className="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg sticky top-0 z-50"
+        className="backdrop-blur-md bg-white/80 border-b border-gray-200/50 shadow-sm sticky top-0 z-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -86,31 +86,48 @@ const Navbar = () => {
               className="flex-shrink-0 flex items-center cursor-pointer group"
               onClick={nav}
             >
-              <FaStore className="h-6 w-6 mr-2 text-white" />
-              <span className="text-white text-xl font-bold tracking-tight md:block">
-                {role === "admin" ? "Admin Panel" : role === "user" ? "Digital Store" : "Digital Store"}
-              </span>
+              <div className="p-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <FaStore className="h-5 w-5 text-white" />
+              </div>
+              <div className="ml-3 hidden sm:block">
+                <span className="text-gray-900 text-xl font-bold tracking-tight">
+                  {role === "admin" ? "Admin Panel" : "Digital Store"}
+                </span>
+                <div className="text-xs text-gray-500 font-medium">
+                  {role === "admin" ? "Management System" : "Books & Audio"}
+                </div>
+              </div>
             </div>
 
-            {/* Desktop Navigation - Icons Only */}
-            <div className="hidden md:flex items-center space-x-4">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-1">
               {currentNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className="text-white hover:bg-indigo-700 p-3 rounded-full flex items-center transition-colors"
-                  title={item.name} // Show tooltip on hover
+                  className="nav-item group relative p-3 rounded-xl text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all duration-200"
+                  title={item.name}
                 >
-                  {item.icon || item.name.charAt(0)}
+                  <div className="relative">
+                    {item.icon}
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+                      {item.name}
+                    </div>
+                  </div>
                 </Link>
               ))}
               {user && (
                 <button
                   onClick={logoutFunction}
-                  className="text-white hover:bg-indigo-700 p-3 rounded-full transition-colors"
+                  className="nav-item group relative p-3 rounded-xl text-gray-600 hover:text-red-600 hover:bg-red-50/50 transition-all duration-200"
                   title="Logout"
                 >
-                  <IoIosLogOut className="h-5 w-5 mr-1" />
+                  <div className="relative">
+                    <IoIosLogOut className="h-5 w-5" />
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+                      Logout
+                    </div>
+                  </div>
                 </button>
               )}
             </div>
@@ -119,7 +136,7 @@ const Navbar = () => {
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setMobileOpen(true)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-indigo-700 focus:outline-none transition-colors"
+                className="inline-flex items-center justify-center p-2 rounded-xl text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50 focus:outline-none transition-all duration-200"
                 aria-label="Open menu"
               >
                 <Menu className="h-6 w-6" />
@@ -129,46 +146,57 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Sidebar - Icons + Text */}
+      {/* Mobile Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-r from-indigo-600 to-purple-600 text-white transform ${
+        className={`fixed inset-y-0 left-0 w-80 backdrop-blur-md bg-white/95 border-r border-gray-200/50 transform ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out z-50`}
+        } transition-transform duration-300 ease-in-out z-50 shadow-2xl`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-indigo-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
           <div className="flex items-center">
-            <FaStore className="h-6 w-6 mr-2" />
-            <span className="text-xl font-bold">
-              {role === "admin" ? "Admin Panel" : role === "user" ? "Digital Store" : "Digital Store"}
-            </span>
+            <div className="p-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg">
+              <FaStore className="h-5 w-5 text-white" />
+            </div>
+            <div className="ml-3">
+              <span className="text-gray-900 text-lg font-bold">
+                {role === "admin" ? "Admin Panel" : "Digital Store"}
+              </span>
+              <div className="text-xs text-gray-500 font-medium">
+                {role === "admin" ? "Management System" : "Books & Audio"}
+              </div>
+            </div>
           </div>
           <button
             onClick={() => setMobileOpen(false)}
-            className="text-white hover:text-indigo-200"
+            className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 transition-colors"
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="p-4 space-y-2">
+        <div className="p-6 space-y-2">
           {currentNavItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className="flex items-center p-3 rounded hover:bg-indigo-700 transition-colors"
+              className="flex items-center p-4 rounded-xl text-gray-700 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all duration-200 group"
               onClick={() => setMobileOpen(false)}
             >
-              {item.icon && <span className="mr-3">{item.icon}</span>}
-              {!item.icon && <span className="mr-3">{item.name.charAt(0)}</span>}
-              <span>{item.name}</span>
+              <div className="p-2 rounded-lg bg-gray-100/50 group-hover:bg-indigo-100/50 transition-colors mr-4">
+                {item.icon}
+              </div>
+              <span className="font-medium">{item.name}</span>
             </Link>
           ))}
           {user && (
             <button
               onClick={logoutFunction}
-              className="w-full flex items-center p-3 rounded hover:bg-indigo-700 transition-colors text-left"
+              className="w-full flex items-center p-4 rounded-xl text-gray-700 hover:text-red-600 hover:bg-red-50/50 transition-all duration-200 group"
             >
-              <IoIosLogOut className="h-5 w-5 mr-1" /> Logout
+              <div className="p-2 rounded-lg bg-gray-100/50 group-hover:bg-red-100/50 transition-colors mr-4">
+                <IoIosLogOut className="h-5 w-5" />
+              </div>
+              <span className="font-medium">Logout</span>
             </button>
           )}
         </div>
@@ -177,7 +205,7 @@ const Navbar = () => {
       {/* Overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0  bg-opacity-50"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           onClick={() => setMobileOpen(false)}
         />
       )}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiX } from "react-icons/fi";
 
 const SearchInput = ({ onSearch }) => {
   const [query, setQuery] = useState("");
@@ -11,16 +11,36 @@ const SearchInput = ({ onSearch }) => {
     }
   };
 
+  const clearSearch = () => {
+    setQuery("");
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="border-2 border-indigo-500 rounded-full">
-      <FiSearch className="absolute left-3 top-3.5 text-gray-400" />
-      <input
-        type="text"
-        placeholder="Search books, authors..."
-        className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <FiSearch className="w-4 h-4 text-gray-400" />
+        </div>
+        
+        <input
+          type="text"
+          placeholder="Search books, authors..."
+          className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+
+        {query && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            <FiX className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
       <button type="submit" className="hidden">Search</button>
     </form>
   );

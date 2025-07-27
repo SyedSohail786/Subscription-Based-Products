@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -52,6 +53,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 const AdminDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -61,10 +63,14 @@ const AdminDashboard = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load dashboard:", err);
-        setLoading(false);
+        if (err.response?.status === 401) {
+          navigate("/admin/login");
+        } else {
+          console.error("Failed to load dashboard:", err);
+          setLoading(false);
+        }
       });
-  }, []);
+  }, [navigate]);
 
   if (loading) {
     return (

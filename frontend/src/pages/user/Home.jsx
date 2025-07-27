@@ -131,17 +131,17 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen bg-indigo-50">
-      <header className="sticky top-0 z-20 bg-indigo-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="relative max-w-xl mx-auto mb-6">
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+          <div className="relative max-w-xl mx-auto mb-4 sm:mb-6">
             <SearchInput onSearch={handleSearch} />
           </div>
           <CategoryDropdown categories={categories} />
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-3">
+      <main className="max-w-7xl mx-auto px-4 py-6">
         <Carousel
           title="Discover eBooks"
           products={filterProductsByCategory("Books")}
@@ -157,14 +157,22 @@ const Home = () => {
         />
 
         {recentlyViewed.length > 0 ? (
-          <Carousel
-            title="Recently Viewed"
-            products={recentlyViewed}
-            refKey="recent"
-            viewAllLink="#"
-          />
+          <div className="relative">
+            <Carousel
+              title="Recently Viewed"
+              products={recentlyViewed}
+              refKey="recent"
+              viewAllLink="#"
+            />
+            <button
+              onClick={clearRecentlyViewed}
+              className="absolute top-0 right-32 text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Clear History
+            </button>
+          </div>
         ) : (
-          <div className="mb-8 sm:mb-12 text-center py-4">
+          <div className="mb-8 sm:mb-12 text-center py-8">
             <p className="text-gray-500">Your recently viewed items will appear here</p>
           </div>
         )}

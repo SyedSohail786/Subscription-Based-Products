@@ -48,15 +48,15 @@ const useAuthStore = create((set,get) => ({
         set({ user: res.data, role: "user" });
       }
     } catch(err) {
-      if(err.status === 401){
-        set({ user: null, role: null });
-        const location = window.location.href
-        if(location === "http://localhost:5173/login"){
-          return;
-        }else {
-          window.location.href = "/login";
-        }
-      }
+      // if(err.status === 401){
+      //   set({ user: null, role: null });
+      //   const location = window.location.href
+      //   if(location === "http://localhost:5173/login"){
+      //     return;
+      //   }else {
+      //     window.location.href = "/login";
+      //   }
+      // }
     }
   }
 }));
