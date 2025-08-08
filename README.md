@@ -3,7 +3,7 @@ Download the full project from GitHub.
 
 ```
 git clone https://subscription-based-products.pages.dev
-cd Digital-Product-Store
+cd Subscription-Based-Products
 ```
 
 ## ⚙️ Step 2: Setup Backend Environment Variables
